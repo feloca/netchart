@@ -1,0 +1,9 @@
+NetChart.Console/bin/
+NetChart.Console/obj/
+NetChart.GeneradorDatos/bin/
+NetChart.GeneradorDatos/obj/
+NetChart.Web/bin/
+NetChart.Web/obj/
+NetChart/bin/
+NetChart/obj/
+packages/

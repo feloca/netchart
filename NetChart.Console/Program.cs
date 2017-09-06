@@ -26,11 +26,11 @@ namespace NetChart.Console
             var nc = new Chart<Persona>();
             nc.Data = datos;
 
-            nc.Variable.Name = "Altura";
-            nc.SecondPropertyName = "Edad";
+            nc.VariableProperty.Name = "Altura";
+            nc.DimensionPropertyName = "Edad";
 
             nc.ChartType = ChartTypeEnum.Debug;
-            nc.Variable.Aggregation = AggregateEnum.Sum;
+            nc.VariableProperty.Aggregation = AggregateEnum.Sum;
 
             var json = nc.Generate();
         }
@@ -41,11 +41,11 @@ namespace NetChart.Console
             var nc = new Chart<Persona>();
             nc.Data = datos;
 
-            nc.Variable.Name = "Altura";
-            nc.SecondPropertyName = "Edad";
+            nc.VariableProperty.Name = "Altura";
+            nc.DimensionPropertyName = "Edad";
 
             nc.ChartType = ChartTypeEnum.Debug;
-            nc.Variable.Aggregation = AggregateEnum.Average;
+            nc.VariableProperty.Aggregation = AggregateEnum.Average;
 
             var json = nc.Generate();
         }
@@ -56,11 +56,11 @@ namespace NetChart.Console
             var nc = new Chart<Persona>();
             nc.Data = datos;
 
-            nc.Variable.Name = "Altura";
-            nc.SecondPropertyName = "Edad";
+            nc.VariableProperty.Name = "Altura";
+            nc.DimensionPropertyName = "Edad";
 
             nc.ChartType = ChartTypeEnum.Debug;
-            nc.Variable.Aggregation = AggregateEnum.Count;
+            nc.VariableProperty.Aggregation = AggregateEnum.Count;
 
             var json = nc.Generate();
         }
@@ -71,11 +71,11 @@ namespace NetChart.Console
             var nc = new Chart<Persona>();
             nc.Data = datos;
 
-            nc.Variable.Name = "Altura";
-            nc.SecondPropertyName = "Edad";
+            nc.VariableProperty.Name = "Altura";
+            nc.DimensionPropertyName = "Edad";
 
             nc.ChartType = ChartTypeEnum.Debug;
-            nc.Variable.Aggregation = AggregateEnum.Maximum;
+            nc.VariableProperty.Aggregation = AggregateEnum.Maximum;
 
             var json = nc.Generate();
         }
@@ -86,11 +86,11 @@ namespace NetChart.Console
             var nc = new Chart<Persona>();
             nc.Data = datos;
 
-            nc.Variable.Name = "Altura";
-            nc.SecondPropertyName = "Edad";
+            nc.VariableProperty.Name = "Altura";
+            nc.DimensionPropertyName = "Edad";
 
             nc.ChartType = ChartTypeEnum.Debug;
-            nc.Variable.Aggregation = AggregateEnum.Minimum;
+            nc.VariableProperty.Aggregation = AggregateEnum.Minimum;
 
             var json = nc.Generate();
         }

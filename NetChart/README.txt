@@ -48,3 +48,25 @@ ese es el 100%, luego la propiedad con datos tendria el valor del porcentaje, ad
 
 
 METER EL ARBOL DE REGLAS EN EL TFM
+combinaciones de variables
+variable principal tiene que existir siempre
+	a)si variable secundaria nula -> usar valores discretos (1, 2, 3, 4, ...) según el número de datos
+	a)si variable secundaria no nula -> usar el valor correspondiente de esa fila
+	b)si variable z nula -> no hacer nada
+	b)si variable z distinto de nula, poner el valor de z en la posicion de x union y
+
+TEMA DE AGRUPACIONES
+a) con solo variable principal si se agrupa no hacer nada (agregacion con un unico dato, luego siempre obtenemos el mismo dato)
+b) si existe segunda variable y agregacion en la principal, perfecto, caso facil agrupar por los distintos valores de la variable secundaria
+c) caso de z, 
+	c1) si variable principal no agregada, => ¿creo que debe estar agregada siempre? => si no secundaria, poner el valor de z directamente, si secundaria hacer un grupo que cumpla x e y y hacer el agregado de z
+	c2) si variable principal agregada -> buscar todos los elementos de esa agregacion, la sera el valor de la agregacion de la var principal y la z sera el nuevo agregado de z
+
+Creo que para output, vamos a necesitar un tipo complejo con valor x, y, y una lista de objetos cumplan estos valores x e y, esto podría simplificar mucho la lógica
+
+06/09/2017 MAÑANA
+1 -crear la propiedad de output con x e y mas la lista de valores. Pensar en el formato JSON a la vez
+2 -revisar la generacion de datos de salida
+3 - revisar las sugerencias
+4- prueba
+5 - limpiar codigo comentado y empezar a borrar cosas viejas

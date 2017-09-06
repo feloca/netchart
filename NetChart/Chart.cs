@@ -117,12 +117,12 @@ namespace NetChart
         //}
 
         /// <summary>
-        /// 
+        /// Obtiene o establece el nombre de la variable de dimension (variable eje x)
         /// </summary>
         /// <remarks>
         /// Si la propiedad no existe en T lanzar una excepcion
         /// </remarks>
-        public string SecondPropertyName
+        public string DimensionPropertyName
         {
             get
             {
@@ -148,7 +148,46 @@ namespace NetChart
             }
         }
 
-        public Property<T> Variable
+        /// <summary>
+        /// Obtiene o establece el nombre de la propiedad que actua como variable principal
+        /// </summary>
+        /// <remarks>
+        /// Accesos para facilitar la configuración de las propiedades, el usuario por defecto solo tendria que seleccionar el nombre de la propiedad
+        /// </remarks>
+        public string VariablePropertyName
+        {
+            get
+            {
+                return this.VariableProperty.Name;
+            }
+            set
+            {
+                this.VariableProperty.Name = value;
+            }
+        }
+
+        /// <summary>
+        /// Obtiene o establece el nombre de la propiedad que actua como variable z
+        /// </summary>
+        /// <remarks>
+        /// Accesos para facilitar la configuración de las propiedades, el usuario por defecto solo tendria que seleccionar el nombre de la propiedad
+        /// </remarks>
+        public string ZVariablePropertyName
+        {
+            get
+            {
+                return this.ZVariableProperty.Name;
+            }
+            set
+            {
+                this.ZVariableProperty.Name = value;
+            }
+        }
+
+        /// <summary>
+        /// Obtiene la configuracion de la variable principal (variable eje y)
+        /// </summary>
+        public Property<T> VariableProperty
         {
             get
             {
@@ -156,7 +195,10 @@ namespace NetChart
             }
         }
 
-        public  Property<T> ZVariable
+        /// <summary>
+        /// Obtiene la configuracion de la variable z (variable interseccion ejes x e y)
+        /// </summary>
+        public  Property<T> ZVariableProperty
         {
             get
             {
@@ -210,6 +252,7 @@ namespace NetChart
                 output.Suggestions = this.GetSuggestions();
             }
 
+            //TODO: pendiente gestionar las 3 variables posible, de manera similar al caso de las sugerencias, hay que meterlo tambien en el tipo output
             this.AddOutputData(output);
             string result = (new JavaScriptSerializer()).Serialize(output);
             //var asd1 = ComputedPropertyData;
@@ -228,14 +271,14 @@ namespace NetChart
                 throw new NetChartException(Message.ErrorConfigurationNoData);
             }
 
-            if (string.IsNullOrEmpty(this.Variable.Name))
+            if (string.IsNullOrEmpty(this.VariableProperty.Name))
             {
                 throw new NetChartException(Message.ErrorConfigurationPropertyNameNull);
             }
             //validar la propiedad secundaria y la agregacion
-            if (this.Variable.Aggregation != AggregateEnum.NoAggregate)
+            if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
             {
-                if (string.IsNullOrEmpty(this.SecondPropertyName))
+                if (string.IsNullOrEmpty(this.DimensionPropertyName))
                 {
                     throw new NetChartException(Message.ErrorConfigurationAggregationWithoutGroup);
                 }
@@ -253,10 +296,10 @@ namespace NetChart
             Dictionary<object, object> processedData = new Dictionary<object, object>();
             Queue<object> keyOrder = new Queue<object>();
 
-            if (this.Variable.Aggregation != AggregateEnum.NoAggregate)
+            if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
             {
                 //var dataProperty = DataHelper.GetProperty(WorkType, this.Variable.Name);
-                var groupProperty = DataHelper.GetProperty(WorkType, this.SecondPropertyName);
+                var groupProperty = DataHelper.GetProperty(WorkType, this.DimensionPropertyName);
 
                 var groups = this.Data.GroupBy(x => groupProperty.GetValue(x));
 
@@ -264,22 +307,22 @@ namespace NetChart
                 foreach (var group in groups)
                 {
                     keyOrder.Enqueue(group.Key);
-                    switch (this.Variable.Aggregation)
+                    switch (this.VariableProperty.Aggregation)
                     {
                         case AggregateEnum.Sum:
-                            groupData = DataHelper.CalculateAggregateSum<T>(this.Variable.Name, group);
+                            groupData = DataHelper.CalculateAggregateSum<T>(this.VariableProperty.Name, group);
                             break;
                         case AggregateEnum.Average:
-                            groupData = DataHelper.CalculateAggregateAverage<T>(this.Variable.Name, group);
+                            groupData = DataHelper.CalculateAggregateAverage<T>(this.VariableProperty.Name, group);
                             break;
                         case AggregateEnum.Count:
-                            groupData = DataHelper.CalculateAggregateCount<T>(this.Variable.Name, group);
+                            groupData = DataHelper.CalculateAggregateCount<T>(this.VariableProperty.Name, group);
                             break;
                         case AggregateEnum.Maximum:
-                            groupData = DataHelper.CalculateAggregateMaximum<T>(this.Variable.Name, group);
+                            groupData = DataHelper.CalculateAggregateMaximum<T>(this.VariableProperty.Name, group);
                             break;
                         case AggregateEnum.Minimum:
-                            groupData = DataHelper.CalculateAggregateMinimum<T>(this.Variable.Name, group);
+                            groupData = DataHelper.CalculateAggregateMinimum<T>(this.VariableProperty.Name, group);
                             break;
                         default:
                             throw new NotSupportedException();
@@ -289,7 +332,7 @@ namespace NetChart
             }
             else
             {
-                //Aqui va el caso de no ser agregados y tambien existe la posibilidad de que no se haya definido la segunda propieddad
+                //Aqui va el caso de no ser agregados y tambien existe la posibilidad de que no se haya definido la segunda propiedad
             }
 
             //TODO: SI METEMOS ORDEN VA AQUI, REORDENAR el objeto de keyOrder y pista            
@@ -330,41 +373,48 @@ namespace NetChart
 
 
             //TODO: Hacer un arbol con las propiedades y meterlo en el documento del TFM
-
-            //VariableTypeEnum mainDisplayType = DataHelper.GetPropertyDisplayType(WorkType, this.PropertyName);
-            VariableTypeEnum mainDisplayType = this.Variable.DisplayType;
+            VariableTypeEnum mainDisplayType = this.VariableProperty.DisplayType;
             VariableTypeEnum secondDisplayType = VariableTypeEnum.Discrete;
             //Si no esta definida toma el valor de la posicion => entero => discreto
-            if (!string.IsNullOrEmpty(this.SecondPropertyName))
+            if (!string.IsNullOrEmpty(this.DimensionPropertyName))
             {
-                secondDisplayType = DataHelper.GetPropertyDisplayType(WorkType, this.SecondPropertyName);
+                secondDisplayType = DataHelper.GetPropertyDisplayType(WorkType, this.DimensionPropertyName);
             }
-            bool useSecondProp = !string.IsNullOrEmpty(this.SecondPropertyName);
+            bool useSecondProp = !string.IsNullOrEmpty(this.DimensionPropertyName);
 
             //hacer lo mismo para la variable z
-
+            //AQUI ME HE QUEDADO
             bool useZProp = false;
+            if (!string.IsNullOrEmpty(this.ZVariableProperty.Name))
+            {
+
+            }
 
             //TODO: hacer un if para una variable, otro if para 2 variables y un if para las 3 variables
             //caso 1, solo usamos la variable principal
             if (useSecondProp == false && useZProp == false)
             {
 
+
+                return results.ToArray();
             }
 
             //caso 2, usamos la variable principal y la secundaria
             if (useSecondProp == true && useZProp == false)
             {
-
+                return results.ToArray();
             }
 
             //caso 3, usamos todas las variables, principal, secundaria y z
             if (useSecondProp == true && useZProp == true)
             {
-
+                return results.ToArray();
             }
+
+            throw new NotSupportedException();
             //asdasd
 
+            /*
             if (this.Variable.Aggregation != AggregateEnum.NoAggregate)
             {
                 if (mainDisplayType == VariableTypeEnum.Discrete)
@@ -409,6 +459,7 @@ namespace NetChart
             }
 
             return results.ToArray();
+            */
         }
 
     }

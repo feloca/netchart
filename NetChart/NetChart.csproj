@@ -47,6 +47,7 @@
     <Compile Include="Message.cs" />
     <Compile Include="NetChartException.cs" />
     <Compile Include="Output.cs" />
+    <Compile Include="OutputDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ChartTypeEnum.cs" />
     <Compile Include="Property.cs" />

@@ -20,8 +20,23 @@ namespace NetChart
 
         //incluir propiedades de presentacion, usar una subclase para agruparlo
 
-        public object[] ComputedPropertyData { get; set; }
+        //public object[] ComputedPropertyData { get; set; }
 
-        public object[] ComputedSecondPropertyData { get; set; }
+        //public object[] ComputedSecondPropertyData { get; set; }
+
+        /// <summary>
+        /// Obtiene o establece los datos procesados del eje y
+        /// </summary>
+        public object[] VariableData { get; set; }
+
+        /// <summary>
+        /// Obtiene o establece los datos procesados del eje x
+        /// </summary>
+        public object[] DimensionData { get; set; }
+
+        /// <summary>
+        /// Obtine o establece los datos procesados del eje z
+        /// </summary>
+        public object[] ZVariableData { get; set; }
     }
 }

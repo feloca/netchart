@@ -287,8 +287,9 @@ namespace NetChart
 
         }
 
+        /*
         /// <summary>
-        /// 
+        /// CODIGO VIEJO, BORRAS DESPUES DE ACTUALIZARLO
         /// </summary>
         private void AddOutputData(Output output)
         {
@@ -346,6 +347,62 @@ namespace NetChart
                 output.ComputedSecondPropertyData[position] = key;
                 output.ComputedPropertyData[position++] = processedData[key];
             }
+        }
+        */
+
+        /// <summary>
+        /// Genera un modelo de datos formateados según la configuración indicada, estos datos son empleados
+        /// por la parte javascript para dibujar el gráfico
+        /// </summary>
+        /// <param name="output"></param>
+        /// <remarks>
+        /// a) con solo variable principal si se agrupa no hacer nada (agregacion con un unico dato, luego siempre obtenemos el mismo dato)
+        /// b) si existe segunda variable y agregacion en la principal, perfecto, caso facil agrupar por los distintos valores de la variable secundaria
+        /// c) caso de z, 
+	    ///   c1) si variable principal no agregada, => ¿creo que debe estar agregada siempre? => si no secundaria, poner el valor de z directamente, si secundaria hacer un grupo que cumpla x e y y hacer el agregado de z
+        ///   c2) si variable principal agregada -> buscar todos los elementos de esa agregacion, la sera el valor de la agregacion de la var principal y la z sera el nuevo agregado de z
+        ///
+        /// </remarks>
+        private void AddOutputData(Output output)
+        {
+            var variableData = new List<OutputDetail<T>>();
+
+            if(this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
+            {
+                if (!string.IsNullOrEmpty(this.DimensionPropertyName))
+                {
+                    //no es nula la dimension, para cada valor de dimension hacer un grupo, en dimension poner la llave del 
+                    //grupo, y en variable el valor del agregado. Poner todos los elementos del grupo en la propiedad outputdetail.DATA
+                }
+                else
+                {
+                    //es nula la dimension, en dimension 0, 1, 2, 3, etc.. en variable el valor de variable, y poner fila en data
+                }
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(this.DimensionPropertyName))
+                {
+                    //no es nula la dimension, hace falta sacar los valores de dimension y de variable, 
+                    //Poner todos los elementos del grupo en la propiedad outputdetail.DATA
+                }
+                else
+                {
+                    //es nula la dimension, luego la dimension es 0, 1, 2, 3, etc.. usar el orden de los datos
+                    //Poner la fila en DATA
+                }
+            }
+
+            //si z distinto de null
+            //trabajamos sobre variableData
+            //si agregado para cada x e y, hacer el agregado
+            //si no agregado, poner el valor de la variable z del primer elemento de la coleccion outputdetail.DATA
+
+            //todo esto va formateado en "output"
+
+            //tendre que mirar si agrupo la primer y si existe dimension
+            //si al llegar a la z tambien existe agrupacion gestionarlo
+            throw new NotImplementedException();
         }
 
         /// <summary>

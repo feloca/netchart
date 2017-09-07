@@ -233,5 +233,88 @@ namespace NetChart
 
             return result;
         }
+
+        /// <summary>
+        /// Calcula el valor de la funcion agregada indicada para un conjunto de datos
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="aggregateType"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static object CalculateAggregate<T>(string propertyName, AggregateEnum aggregateType, IEnumerable<T> data)
+        {
+            object result = null;
+            switch (aggregateType)
+            {
+                case AggregateEnum.Sum:
+                    result = DataHelper.CalculateAggregateSum<T>(propertyName, data);
+                    break;
+                case AggregateEnum.Average:
+                    result = DataHelper.CalculateAggregateAverage<T>(propertyName, data);
+                    break;
+                case AggregateEnum.Count:
+                    result = DataHelper.CalculateAggregateCount<T>(propertyName, data);
+                    break;
+                case AggregateEnum.Maximum:
+                    result = DataHelper.CalculateAggregateMaximum<T>(propertyName, data);
+                    break;
+                case AggregateEnum.Minimum:
+                    result = DataHelper.CalculateAggregateMinimum<T>(propertyName, data);
+                    break;
+                default:
+                    throw new NotSupportedException();
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Obiene una lista con todos los valores distintos de una propiedad incluidos en la coleccion
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static List<object> GetPropertyValues<T>(string propertyName, IEnumerable<T> data)
+        {
+            List<object> results = new List<object>();
+            var property = GetProperty(typeof(T), propertyName);
+
+            switch (property.PropertyType.Name)
+            {
+                case "Float":                    
+                    data.Select(x => (float)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
+                    break;
+                case "Decimal":
+                    data.Select(x => (decimal)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
+                    break;
+                case "Int32":
+                    data.Select(x => (int)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
+                    break;
+                case "Long":
+                    data.Select(x => (long)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
+                    break;
+                default:
+                    var asd = property.PropertyType.Name;
+                    throw new NotSupportedException();
+            }
+
+            return results;
+        }
+
+        /// <summary>
+        /// Obtiene las filas pertenecientes a una agrupación dados los criterios de agrupacion de propiedad y valor
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="groupProperty"></param>
+        /// <param name="groupPropertyValue"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
+        public static List<T> GetGroupRows<T>(string groupProperty, object groupPropertyValue, IEnumerable<T> data)
+        {
+            var property = GetProperty(typeof(T), groupProperty);
+            return data.Where(x => property.GetValue(x) == groupPropertyValue).ToList();
+        }
     }
 }

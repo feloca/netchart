@@ -46,6 +46,7 @@ incluir propiedad para mostrar datos relativos?, si lo hago, coger la propiedad 
 ese es el 100%, luego la propiedad con datos tendria el valor del porcentaje, ademas, cambiar uno de los ejes para que sus valores vayan del 
 0 al 100 % (en este caso, es la propiedad de los datos)
 
+PENDIENTE: no he tenido en cuenta la gestión de agregados o variables de tipo string (categóricos), tampoco gestiono que la propiedad sea un objeto y no un tipo básico
 
 METER EL ARBOL DE REGLAS EN EL TFM
 combinaciones de variables

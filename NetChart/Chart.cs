@@ -366,6 +366,7 @@ namespace NetChart
         private void AddOutputData(Output output)
         {
             var variableData = new List<OutputDetail<T>>();
+            var details = new List<OutputDetail<T>>();
 
             if(this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
             {
@@ -373,16 +374,39 @@ namespace NetChart
                 {
                     //no es nula la dimension, para cada valor de dimension hacer un grupo, en dimension poner la llave del 
                     //grupo, y en variable el valor del agregado. Poner todos los elementos del grupo en la propiedad outputdetail.DATA
+                    var dimensionValues = DataHelper.GetPropertyValues<T>(this.DimensionPropertyName, this.Data);
+                    for(int i = 0; i < dimensionValues.Count; ++i)
+                    {
+                        var groupRows = DataHelper.GetGroupRows<T>(this.DimensionPropertyName, dimensionValues[i], this.Data);
+                        var agregateValue = DataHelper.CalculateAggregate<T>(this.VariableProperty.Name, this.VariableProperty.Aggregation, groupRows);
+                        details.Add(new OutputDetail<T>()
+                        {
+                            VariableDatum = agregateValue,
+                            DimensionDatum = dimensionValues[i],
+                            Data = groupRows
+                        });
+                    }
                 }
                 else
                 {
                     //es nula la dimension, en dimension 0, 1, 2, 3, etc.. en variable el valor de variable, y poner fila en data
+                    var propertyInfo = DataHelper.GetProperty(this.WorkType, this.VariableProperty.Name);
+                    for (int i = 0; i < this.Data.Count; ++i)
+                    {
+                        details.Add(new OutputDetail<T>()
+                        {
+                            VariableDatum = propertyInfo.GetValue(this.Data[i]),
+                            DimensionDatum = i,
+                            Data = new List<T>() { this.Data[i] }
+                        });
+                    }
                 }
             }
             else
             {
                 if (!string.IsNullOrEmpty(this.DimensionPropertyName))
                 {
+                    aqui me quede
                     //no es nula la dimension, hace falta sacar los valores de dimension y de variable, 
                     //Poner todos los elementos del grupo en la propiedad outputdetail.DATA
                 }

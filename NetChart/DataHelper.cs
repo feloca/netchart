@@ -303,6 +303,19 @@ namespace NetChart
             return results;
         }
 
+        ///// <summary>
+        ///// Obtine el valor de una propiedad indicada de manera genérica
+        ///// </summary>
+        ///// <typeparam name="T"></typeparam>
+        ///// <param name="propertyName"></param>
+        ///// <param name="instance"></param>
+        ///// <returns></returns>
+        //public static object GetPropertyValue<T>(string propertyName, T instance)
+        //{
+        //    var property = GetProperty(typeof(T), propertyName);
+        //    return property.GetValue(instance);
+        //}
+
         /// <summary>
         /// Obtiene las filas pertenecientes a una agrupación dados los criterios de agrupacion de propiedad y valor
         /// </summary>
@@ -316,5 +329,6 @@ namespace NetChart
             var property = GetProperty(typeof(T), groupProperty);
             return data.Where(x => property.GetValue(x) == groupPropertyValue).ToList();
         }
+
     }
 }

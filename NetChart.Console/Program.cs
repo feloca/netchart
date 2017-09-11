@@ -97,7 +97,9 @@ namespace NetChart.Console
 
         private static List<Persona> CargarDatos()
         {
+            throw new NotImplementedException();
             List<Persona> lista = new List<Persona>();
+            /*
             lista.AddRange(new Persona[] {
                 new Persona(){Edad=59, Altura=207, Coeficiente=119},
                 new Persona(){Edad=50, Altura=185, Coeficiente=133},
@@ -150,6 +152,7 @@ namespace NetChart.Console
                 new Persona(){Edad=60, Altura=153, Coeficiente=110},
                 new Persona(){Edad=57, Altura=199, Coeficiente=72}
             });
+            */
             return lista;
         }
     }

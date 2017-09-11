@@ -13,6 +13,7 @@ namespace NetChart
         public Chart()
         {
             this._dataProperty = new Property<T>();
+            this._dimensionProperty = new Property<T>();
             this._zDataProperty = new Property<T>();
         }
 
@@ -43,14 +44,13 @@ namespace NetChart
         //private T _type = null;
         private string _propertyName;
         private AggregateEnum _propertyAggregation;
-        private string _secondPropertyName;        
+        private string _secondPropertyName;
         private ChartTypeEnum _chartType;
 
         //AQUI VA EL FORMATO NUEVO
         private Property<T> _dataProperty;
+        private Property<T> _dimensionProperty;
         private Property<T> _zDataProperty;
-
-
 
         private Type WorkType
         {
@@ -73,48 +73,6 @@ namespace NetChart
         /// </remarks>
         public List<T> Data { get; set; }
 
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <remarks>
-        ///// Si la propiedad no existe en T lanzar excepcion
-        ///// </remarks>
-        //public string PropertyName
-        //{
-        //    get { return this._propertyName; }
-        //    set
-        //    {
-
-        //        if (string.IsNullOrEmpty(this._propertyName) || !this._propertyName.Equals(value.ToLower()))
-        //        {
-        //            //validar que pone una propiedad existente
-        //            if (DataHelper.GetProperty(WorkType, value) == null)
-        //            {
-        //                throw new NetChartException(string.Format(Message.ErrorInvalidPropertyName, value, WorkType.Name));
-        //            }
-        //            this._propertyName = value;
-        //        }
-        //    }
-        //}
-
-        ///// <summary>
-        ///// 
-        ///// </summary>
-        ///// <remarks>
-        ///// Si distinto de NOAGGREGATE, crear automaticamente una agrupacion de datos
-        ///// y establecer el campo SecondDataProperty con el campo de agrupación
-        ///// </remarks>
-        //public AggregateEnum PropertyAggregation
-        //{
-        //    get { return this._propertyAggregation; }
-        //    set
-        //    {
-        //        if (this._propertyAggregation != value)
-        //        {
-        //            this._propertyAggregation = value;
-        //        }
-        //    }
-        //}
 
         /// <summary>
         /// Obtiene o establece el nombre de la variable de dimension (variable eje x)
@@ -198,7 +156,7 @@ namespace NetChart
         /// <summary>
         /// Obtiene la configuracion de la variable z (variable interseccion ejes x e y)
         /// </summary>
-        public  Property<T> ZVariableProperty
+        public Property<T> ZVariableProperty
         {
             get
             {
@@ -255,8 +213,6 @@ namespace NetChart
             //TODO: pendiente gestionar las 3 variables posible, de manera similar al caso de las sugerencias, hay que meterlo tambien en el tipo output
             this.AddOutputData(output);
             string result = (new JavaScriptSerializer()).Serialize(output);
-            //var asd1 = ComputedPropertyData;
-            //var asd2 = ComputedSecondPropertyData;
             return result;
         }
 
@@ -287,69 +243,6 @@ namespace NetChart
 
         }
 
-        /*
-        /// <summary>
-        /// CODIGO VIEJO, BORRAS DESPUES DE ACTUALIZARLO
-        /// </summary>
-        private void AddOutputData(Output output)
-        {
-            //object[] mainData = null, secondaryData = null;
-            Dictionary<object, object> processedData = new Dictionary<object, object>();
-            Queue<object> keyOrder = new Queue<object>();
-
-            if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
-            {
-                //var dataProperty = DataHelper.GetProperty(WorkType, this.Variable.Name);
-                var groupProperty = DataHelper.GetProperty(WorkType, this.DimensionPropertyName);
-
-                var groups = this.Data.GroupBy(x => groupProperty.GetValue(x));
-
-                object groupData = null;
-                foreach (var group in groups)
-                {
-                    keyOrder.Enqueue(group.Key);
-                    switch (this.VariableProperty.Aggregation)
-                    {
-                        case AggregateEnum.Sum:
-                            groupData = DataHelper.CalculateAggregateSum<T>(this.VariableProperty.Name, group);
-                            break;
-                        case AggregateEnum.Average:
-                            groupData = DataHelper.CalculateAggregateAverage<T>(this.VariableProperty.Name, group);
-                            break;
-                        case AggregateEnum.Count:
-                            groupData = DataHelper.CalculateAggregateCount<T>(this.VariableProperty.Name, group);
-                            break;
-                        case AggregateEnum.Maximum:
-                            groupData = DataHelper.CalculateAggregateMaximum<T>(this.VariableProperty.Name, group);
-                            break;
-                        case AggregateEnum.Minimum:
-                            groupData = DataHelper.CalculateAggregateMinimum<T>(this.VariableProperty.Name, group);
-                            break;
-                        default:
-                            throw new NotSupportedException();
-                    }
-                    processedData.Add(group.Key, groupData);
-                }
-            }
-            else
-            {
-                //Aqui va el caso de no ser agregados y tambien existe la posibilidad de que no se haya definido la segunda propiedad
-            }
-
-            //TODO: SI METEMOS ORDEN VA AQUI, REORDENAR el objeto de keyOrder y pista            
-            output.ComputedPropertyData = new object[keyOrder.Count];
-            output.ComputedSecondPropertyData = new object[keyOrder.Count];
-            int position = 0;
-            object key = null;
-            while (keyOrder.Count != 0)
-            {
-                key = keyOrder.Dequeue();
-                output.ComputedSecondPropertyData[position] = key;
-                output.ComputedPropertyData[position++] = processedData[key];
-            }
-        }
-        */
-
         /// <summary>
         /// Genera un modelo de datos formateados según la configuración indicada, estos datos son empleados
         /// por la parte javascript para dibujar el gráfico
@@ -365,17 +258,19 @@ namespace NetChart
         /// </remarks>
         private void AddOutputData(Output output)
         {
-            var variableData = new List<OutputDetail<T>>();
+            //var variableData = new List<OutputDetail<T>>();
             var details = new List<OutputDetail<T>>();
+            var zDetails = new List<OutputDetail<T>>();
 
-            if(this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
+            //TODO: este if se puede refactorizar, los dos else internos son iguales
+            if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
             {
                 if (!string.IsNullOrEmpty(this.DimensionPropertyName))
                 {
                     //no es nula la dimension, para cada valor de dimension hacer un grupo, en dimension poner la llave del 
                     //grupo, y en variable el valor del agregado. Poner todos los elementos del grupo en la propiedad outputdetail.DATA
                     var dimensionValues = DataHelper.GetPropertyValues<T>(this.DimensionPropertyName, this.Data);
-                    for(int i = 0; i < dimensionValues.Count; ++i)
+                    for (int i = 0; i < dimensionValues.Count; ++i)
                     {
                         var groupRows = DataHelper.GetGroupRows<T>(this.DimensionPropertyName, dimensionValues[i], this.Data);
                         var agregateValue = DataHelper.CalculateAggregate<T>(this.VariableProperty.Name, this.VariableProperty.Aggregation, groupRows);
@@ -404,16 +299,39 @@ namespace NetChart
             }
             else
             {
+                //caso de no agregacion
+
                 if (!string.IsNullOrEmpty(this.DimensionPropertyName))
                 {
-                    aqui me quede
                     //no es nula la dimension, hace falta sacar los valores de dimension y de variable, 
                     //Poner todos los elementos del grupo en la propiedad outputdetail.DATA
+                    var propertyInfo = DataHelper.GetProperty(this.WorkType, this.VariableProperty.Name);
+                    var dimensionPropertyInfo = DataHelper.GetProperty(this.WorkType, this.DimensionPropertyName);
+                    for (int i = 0; i < this.Data.Count; ++i)
+                    {
+                        details.Add(new OutputDetail<T>()
+                        {
+                            VariableDatum = propertyInfo.GetValue(this.Data[i]),
+                            DimensionDatum = dimensionPropertyInfo.GetValue(this.Data[i]),
+                            Data = new List<T>() { this.Data[i] }
+                        });
+                    }
+
                 }
                 else
                 {
                     //es nula la dimension, luego la dimension es 0, 1, 2, 3, etc.. usar el orden de los datos
                     //Poner la fila en DATA
+                    var propertyInfo = DataHelper.GetProperty(this.WorkType, this.VariableProperty.Name);
+                    for (int i = 0; i < this.Data.Count; ++i)
+                    {
+                        details.Add(new OutputDetail<T>()
+                        {
+                            VariableDatum = propertyInfo.GetValue(this.Data[i]),
+                            DimensionDatum = i,
+                            Data = new List<T>() { this.Data[i] }
+                        });
+                    }
                 }
             }
 
@@ -421,12 +339,56 @@ namespace NetChart
             //trabajamos sobre variableData
             //si agregado para cada x e y, hacer el agregado
             //si no agregado, poner el valor de la variable z del primer elemento de la coleccion outputdetail.DATA
+            if (this.ZVariableProperty.IsDefined)
+            {
+                if (this.ZVariableProperty.Aggregation != AggregateEnum.NoAggregate)
+                {
+                    //caso de agregacion en z
+                    //poner en z el valor de la agregacion de la coleccion de datos
+                    output.VariableData = new object[details.Count];
+                    output.DimensionData = new object[details.Count];
+                    output.ZVariableData = new object[details.Count];
 
-            //todo esto va formateado en "output"
+                    for (int i = 0; i < details.Count; ++i)
+                    {
+                        output.VariableData[i] = details[i].VariableDatum;
+                        output.DimensionData[i] = details[i].DimensionDatum;
+                        output.ZVariableData[i] = DataHelper.CalculateAggregate<T>(this.ZVariableProperty.Name, this.ZVariableProperty.Aggregation, details[i].Data);
+                    }
 
-            //tendre que mirar si agrupo la primer y si existe dimension
-            //si al llegar a la z tambien existe agrupacion gestionarlo
-            throw new NotImplementedException();
+                }
+                else
+                {
+                    //caso de no agregacion en z
+                    //poner el valor de z del primer elemento de la coleccion de datos
+                    var zPropertyInfo = DataHelper.GetProperty(this.WorkType, this.VariableProperty.Name);
+
+                    output.VariableData = new object[details.Count];
+                    output.DimensionData = new object[details.Count];
+                    output.ZVariableData = new object[details.Count];
+
+                    for (int i = 0; i < details.Count; ++i)
+                    {
+                        output.VariableData[i] = details[i].VariableDatum;
+                        output.DimensionData[i] = details[i].DimensionDatum;
+                        output.ZVariableData[i] = zPropertyInfo.GetValue(details[i].Data.First());
+                    }
+
+                }
+            }
+            else
+            {
+                //caso, no hay z         
+                output.VariableData = new object[details.Count];
+                output.DimensionData = new object[details.Count];
+                output.ZVariableData = null;
+                for (int i = 0; i < details.Count; ++i)
+                {
+                    output.VariableData[i] = details[i].VariableDatum;
+                    output.DimensionData[i] = details[i].DimensionDatum;
+                }
+            }
+
         }
 
         /// <summary>
@@ -436,13 +398,6 @@ namespace NetChart
         private string[] GetSuggestions()
         {
             var results = new List<string>();
-
-            //encuentra la primera propiedad y su tipo
-            //encuentra la segunda propiedad y su tipo
-            //encuentra la tercera propiedad y su tipo
-
-            //mirar si existe agregacion
-
             //OJO, las variables cuantitaticas discretas pueden tratarse como continuas,
             //contemplar la posibilidad de poner un comentario al usuario
 
@@ -452,48 +407,85 @@ namespace NetChart
             //para no agragados: -si tipo int o long -> recomendar barras, aunque podria usar linea
             //                   -si tipo float o decimal -> recomendar linea
 
-
             //TODO: Hacer un arbol con las propiedades y meterlo en el documento del TFM
-            VariableTypeEnum mainDisplayType = this.VariableProperty.DisplayType;
-            VariableTypeEnum secondDisplayType = VariableTypeEnum.Discrete;
+            //VariableTypeEnum mainDisplayType = this.VariableProperty.DisplayType;
+            VariableTypeEnum dimensionDisplayType = VariableTypeEnum.Discrete;
+
             //Si no esta definida toma el valor de la posicion => entero => discreto
+            //AUNQUE NO ESTE DEFINIDA, siempre se usa la dimension
             if (!string.IsNullOrEmpty(this.DimensionPropertyName))
             {
-                secondDisplayType = DataHelper.GetPropertyDisplayType(WorkType, this.DimensionPropertyName);
+                dimensionDisplayType = DataHelper.GetPropertyDisplayType(WorkType, this.DimensionPropertyName);
             }
-            bool useSecondProp = !string.IsNullOrEmpty(this.DimensionPropertyName);
 
-            //hacer lo mismo para la variable z
-            //AQUI ME HE QUEDADO
-            bool useZProp = false;
-            if (!string.IsNullOrEmpty(this.ZVariableProperty.Name))
+            if (this.ZVariableProperty.IsDefined)
             {
-
+                //creo que en este caso no importa si la z es agregada o no, aquí va un valor discreto de z
+                switch (this.ZVariableProperty.DisplayType)
+                {
+                    case VariableTypeEnum.Continuous:
+                        results.Add(ChartTypeEnum.Bubble.ToString());
+                        results.Add(ChartTypeEnum.Temperature.ToString());
+                        break;
+                    case VariableTypeEnum.Discrete:
+                        results.Add(ChartTypeEnum.Bubble.ToString());
+                        results.Add(ChartTypeEnum.Temperature.ToString());
+                        break;
+                    case VariableTypeEnum.Nominal:
+                        //TODO: No se que poner aqui, creo deberiamos de poner una etiqueta
+                        throw new NotImplementedException();
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }                
             }
-
-            //TODO: hacer un if para una variable, otro if para 2 variables y un if para las 3 variables
-            //caso 1, solo usamos la variable principal
-            if (useSecondProp == false && useZProp == false)
+            else
             {
+                switch (this.VariableProperty.DisplayType)
+                {
+                    case VariableTypeEnum.Continuous:
+                        break;
+                    case VariableTypeEnum.Discrete:
+                        break;
+                    case VariableTypeEnum.Nominal:
+                        break;
+                    default:
+                        throw new NotSupportedException();
+                }
 
-
-                return results.ToArray();
+                //TODO: hacer un excel y cargarlo en tableau, usar los criterios recomendados
+                //asd AQUI ME HE QUEDADO, creo que la dimension tambien tiene que ser propiedad? o mirar el tipo
+                results.Add(ChartTypeEnum.Bar.ToString());
+                results.Add(ChartTypeEnum.Line.ToString());
+                results.Add(ChartTypeEnum.Pie.ToString());
+                results.Add(ChartTypeEnum.Radar.ToString());
+                results.Add(ChartTypeEnum.Scatter.ToString());
             }
 
-            //caso 2, usamos la variable principal y la secundaria
-            if (useSecondProp == true && useZProp == false)
-            {
-                return results.ToArray();
-            }
+            return results.ToArray();
 
-            //caso 3, usamos todas las variables, principal, secundaria y z
-            if (useSecondProp == true && useZProp == true)
-            {
-                return results.ToArray();
-            }
+            ////TODO: hacer un if para una variable, otro if para 2 variables y un if para las 3 variables
+            ////caso 1, solo usamos la variable principal
+            //if (useSecondProp == false && useZProp == false)
+            //{
 
-            throw new NotSupportedException();
-            //asdasd
+
+            //    return results.ToArray();
+            //}
+
+            ////caso 2, usamos la variable principal y la secundaria
+            //if (useSecondProp == true && useZProp == false)
+            //{
+            //    return results.ToArray();
+            //}
+
+            ////caso 3, usamos todas las variables, principal, secundaria y z
+            //if (useSecondProp == true && useZProp == true)
+            //{
+            //    return results.ToArray();
+            //}
+
+            //throw new NotSupportedException();
 
             /*
             if (this.Variable.Aggregation != AggregateEnum.NoAggregate)

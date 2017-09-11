@@ -38,9 +38,6 @@ hay que empezar a definir modelos a representar y segun ellos ver como ajustamos
 Me gusta edad y altura, media como ejemplo de coleccion.
 HOJA EXCEL
 
-Ha futuro,
-meter una tercera propiedad, si eso, incluir campos para agregar z.
-meter grafico de tarta, temperatura y burbujas
 
 incluir propiedad para mostrar datos relativos?, si lo hago, coger la propiedad z o la principal, sumar los valores de todos sus datos y 
 ese es el 100%, luego la propiedad con datos tendria el valor del porcentaje, ademas, cambiar uno de los ejes para que sus valores vayan del 
@@ -71,3 +68,10 @@ Creo que para output, vamos a necesitar un tipo complejo con valor x, y, y una l
 3 - revisar las sugerencias
 4- prueba
 5 - limpiar codigo comentado y empezar a borrar cosas viejas
+
+09/09/2017 
+Me he quedado en el generador de sugrencias de la clase Chart
+Hay que crear un generador de CSV para probar en tableau la logica, generar los mismos datos en objetos para poder probar los resultados.
+
+11/09/2017
+Definir un nuevo tipo dimensionProperty que herede de property y permitir definir intervalos -> pensar si es necesario, propiedades limites, y podría trabajar sin nombre de variable

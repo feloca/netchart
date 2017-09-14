@@ -43,7 +43,6 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Persona.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -51,6 +50,10 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <ProjectReference Include="..\NetChart.GeneradorDatos\NetChart.GeneradorDatos.csproj">
+      <Project>{0fb941d9-8eff-406c-91eb-8a5ab2658c47}</Project>
+      <Name>NetChart.GeneradorDatos</Name>
+    </ProjectReference>
     <ProjectReference Include="..\NetChart\NetChart.csproj">
       <Project>{fc8e39c6-d3ec-40fd-b803-8e960dc20547}</Project>
       <Name>NetChart</Name>

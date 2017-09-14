@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace NetChart.Console
+namespace NetChart.GeneradorDatos
 {
     public class Persona
     {

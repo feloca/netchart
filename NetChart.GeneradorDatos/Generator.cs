@@ -1,29 +1,19 @@
-﻿using NetChart.Console;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace NetChart.GeneradorDatos
 {
-    class Program
+    public class Generator
     {
         public const int NumeroDatos = 50;
         public const int Semilla = 1234;
 
-        static void Main(string[] args)
-        {
-            var listaPersonas = GenerarPersonas();
-            //var salidaObjetos = GenerarDatosPersonas();
-            var salidaCsv = GenerarCSVPersonas(listaPersonas);
-            System.Console.WriteLine("Pulsa intro para terminar");
-            System.Console.ReadLine();
-        }
-
         private static Random rnd = new Random(Semilla);
 
-        private static string GenerarDatosPersonas()
+
+        public static string GenerarDatosPersonas()
         {
             string mascara = "new Persona(){0}Edad={2}, Altura={3}, Coeficiente={4}{1}, ";
             var rnd = new Random();
@@ -33,16 +23,17 @@ namespace NetChart.GeneradorDatos
             {
                 sbPersonas.AppendLine(string.Format(mascara, "{", "}", rnd.Next(15, 65), rnd.Next(140, 210), rnd.Next(70, 150)));
             }
-            
+
             sbPersonas = sbPersonas.Remove(sbPersonas.Length - 4, 4);
 
-            
+
             return sbPersonas.ToString();
         }
 
-        private static List<Persona> GenerarPersonas()
+
+        public static List<Persona> GenerarPersonas()
         {
-            var resultados = new List<Persona>();            
+            var resultados = new List<Persona>();
 
             var nacionalidades = new string[] { "alemana", "portuguesa", "francesa", "italiana" };
             var ocupaciones = new string[] { "medico", "secretario", "estudiante", "repartidor", "empresario" };
@@ -69,19 +60,19 @@ namespace NetChart.GeneradorDatos
             return resultados;
         }
 
-        private static string GenerarCSVPersonas(List<Persona> lista)
+        public static string GenerarCSVPersonas(List<Persona> lista)
         {
             //aqui hay que montar un csv
             var sbCsv = new StringBuilder();
             sbCsv.AppendLine("PersonaID,Edad,Altura,Peso,Tension,Nacionalidad,Ocupacion,Estudios,Ingresos");
             string mascara = "{0},{1},{2},{3},{4},{5},{6},{7},{8}";
-            for(int i = 0; i < lista.Count; ++i)
+            for (int i = 0; i < lista.Count; ++i)
             {
                 sbCsv.AppendLine(string.Format(
-                    mascara, lista[i].PersonaId, lista[i].Edad, lista[i].Altura, 
-                    lista[i].Peso.ToString().Replace(",","."), 
-                    lista[i].Tension.ToString().Replace(",", "."), 
-                    lista[i].Nacionalidad, lista[i].Ocupacion, lista[i].Estudios, 
+                    mascara, lista[i].PersonaId, lista[i].Edad, lista[i].Altura,
+                    lista[i].Peso.ToString().Replace(",", "."),
+                    lista[i].Tension.ToString().Replace(",", "."),
+                    lista[i].Nacionalidad, lista[i].Ocupacion, lista[i].Estudios,
                     lista[i].Ingresos
                     ));
             }
@@ -90,7 +81,7 @@ namespace NetChart.GeneradorDatos
         }
 
         public static double GetRandomFloat(double minimum, double maximum)
-        {        
+        {
             var numeroAleatorio = rnd.NextDouble();
             var compuesto = numeroAleatorio * (maximum - minimum) + minimum;
             return Math.Round(compuesto, 1);

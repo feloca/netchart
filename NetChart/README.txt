@@ -75,3 +75,4 @@ Hay que crear un generador de CSV para probar en tableau la logica, generar los 
 
 11/09/2017
 Definir un nuevo tipo dimensionProperty que herede de property y permitir definir intervalos -> pensar si es necesario, propiedades limites, y podría trabajar sin nombre de variable
+=> aqui ando, he metido la propiedad para dimension y he ajustado la funcion de validaciones, hay que seguir revisando el uso de la promiedad dimension

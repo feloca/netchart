@@ -108,7 +108,13 @@ namespace NetChart
             throw new NotImplementedException();
         }
 
-
+        /// <summary>
+        /// Obtiene el valor agregado de la suma para un conjunto de datos
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static object CalculateAggregateSum<T>(string propertyName, IEnumerable<T> data)
         {
             object result = null;
@@ -127,15 +133,23 @@ namespace NetChart
                 case "Long":
                     result = data.Sum(x => (long)property.GetValue(x));
                     break;
+                case "String":
+                    throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
                 default:
-                    var asd = property.PropertyType.Name;
+                    //var asd = property.PropertyType.Name;
                     throw new NotSupportedException();
             }
 
             return result;
         }
 
-
+        /// <summary>
+        /// Obtiene el valor agregado medio para un conjunto de datos
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static object CalculateAggregateAverage<T>(string propertyName, IEnumerable<T> data)
         {
             object result = null;
@@ -154,14 +168,23 @@ namespace NetChart
                 case "Long":
                     data.Average(x => (long)property.GetValue(x));
                     break;
+                case "String":
+                    throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
                 default:
-                    var asd = property.PropertyType.Name;
+                    //var asd = property.PropertyType.Name;
                     throw new NotSupportedException();
             }
 
             return result;
         }
 
+        /// <summary>
+        /// Obtine el valor agregado del total de elementos para un conjunto de datos
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static object CalculateAggregateCount<T>(string propertyName, IEnumerable<T> data)
         {
             object result = null;
@@ -172,16 +195,24 @@ namespace NetChart
                 case "Decimal":
                 case "Int32":
                 case "Long":
+                case "String":
                     result = data.Count();
                     break;
                 default:
-                    var asd = property.PropertyType.Name;
+                    //var asd = property.PropertyType.Name;
                     throw new NotSupportedException();
             }
 
             return result;
         }
 
+        /// <summary>
+        /// Obtiene el valor máximo agregado para un conjunto de datos
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static object CalculateAggregateMaximum<T>(string propertyName, IEnumerable<T> data)
         {
             object result = null;
@@ -200,14 +231,24 @@ namespace NetChart
                 case "Long":
                     result = data.Max(x => (long)property.GetValue(x));
                     break;
+                case "String":
+                    result = data.Max(x=> (string)property.GetValue(x));
+                    break;
                 default:
-                    var asd = property.PropertyType.Name;
+                    //var asd = property.PropertyType.Name;
                     throw new NotSupportedException();
             }
 
             return result;
         }
 
+        /// <summary>
+        /// Obtiene el valor minimo agregado para un conjunto de datos
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="propertyName"></param>
+        /// <param name="data"></param>
+        /// <returns></returns>
         public static object CalculateAggregateMinimum<T>(string propertyName, IEnumerable<T> data)
         {
             object result = null;
@@ -226,8 +267,11 @@ namespace NetChart
                 case "Long":
                     result = data.Min(x => (long)property.GetValue(x));
                     break;
+                case "String":
+                    result = data.Min(x => (string)property.GetValue(x));
+                    break;
                 default:
-                    var asd = property.PropertyType.Name;
+                    //var asd = property.PropertyType.Name;
                     throw new NotSupportedException();
             }
 

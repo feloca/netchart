@@ -25,26 +25,13 @@ namespace NetChart
             //OJO, CREO QUE no hay que preocuparse por las validaciones porque al generar se valida
         }
 
-        ///entiendo que con la propiedad x deberia de inferir la propiedad y a partir de sus maximos y minimos
-        ///al enchufar las propiedades de datos permitir tipar (incluir opcion sin tipo), las listas de datos object?, y validar que coincidan con el tipo del dato
-        ///1, 2 o 3 series de datos
-        ///Tipo -> enumerado, tipo de grafico seleccionado
-        ///ListaX, ListaY, ListZ
-        ///PropiedadX, PropiedadY, PropiedadZ
-
-        ///ModoDeveloper 
-        ///SUGERENCIAS[]
-        ///
-
-
         //temas de presentacion
         //titulo
         //titulo eje x, eje y (incluir propiedad de configuración)      
 
-        //private T _type = null;
-        private string _propertyName;
-        private AggregateEnum _propertyAggregation;
-        private string _secondPropertyName;
+        //private string _propertyName;
+        //private AggregateEnum _propertyAggregation;
+        //private string _secondPropertyName;
         private ChartTypeEnum _chartType;
 
         //AQUI VA EL FORMATO NUEVO
@@ -84,25 +71,11 @@ namespace NetChart
         {
             get
             {
-                return this._secondPropertyName;
+                return this._dimensionProperty.Name;
             }
             set
             {
-                if (string.IsNullOrEmpty(this._secondPropertyName) || !this._secondPropertyName.Equals(value, StringComparison.InvariantCultureIgnoreCase))
-                {
-                    //permitimos cadena vacia por si queremos que indice o valores de x sean el orden de los datos
-                    if (string.IsNullOrEmpty(value))
-                    {
-                        this._secondPropertyName = value;
-                        return;
-                    }
-                    //validar que pone una propiedad existente
-                    if (DataHelper.GetProperty(WorkType, value) == null)
-                    {
-                        throw new NetChartException(string.Format(Message.ErrorInvalidPropertyName, value, WorkType.Name));
-                    }
-                    this._secondPropertyName = value;
-                }
+                this._dimensionProperty.Name = value;
             }
         }
 
@@ -150,6 +123,17 @@ namespace NetChart
             get
             {
                 return this._dataProperty;
+            }
+        }
+
+        /// <summary>
+        /// Obtiene la configuracion de la dimension (variable eje x)
+        /// </summary>
+        public Property<T> DimensionProperty
+        {
+            get
+            {
+                return this._dimensionProperty;
             }
         }
 
@@ -219,6 +203,14 @@ namespace NetChart
         /// <summary>
         /// Valida que la configuración establecida es correcta para poder generar un gráfico
         /// </summary>
+        /// <remarks>
+        /// 1 - Validar que se haya indicado datos
+        /// 2 - Validar que se haya definido la variable principal
+        /// 3 - Validar si si existe agregacion en variable o en dimension, que solo exista en una de ellas
+        /// 4 - Validar que si existe agregacion en variable que la dimension este definida
+        /// 5 - Validar que las agregaciones realizadas sobre nominales u ordinales no sean de suma ni de media
+        /// NOTA: linq no permite agregar suma o media sobre tipos cadena
+        /// </remarks>
         private void ValidateConfiguration()
         {
             //TODO: no tengo claro que sea necesario validar la existencia de datos para poder decir si la configuración es correcta
@@ -227,20 +219,41 @@ namespace NetChart
                 throw new NetChartException(Message.ErrorConfigurationNoData);
             }
 
-            if (string.IsNullOrEmpty(this.VariableProperty.Name))
+            if (!this.VariableProperty.IsDefined)
             {
                 throw new NetChartException(Message.ErrorConfigurationPropertyNameNull);
             }
-            //validar la propiedad secundaria y la agregacion
-            if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
+
+            if (this.VariableProperty.IsDefined && this.DimensionProperty.IsDefined)
             {
-                if (string.IsNullOrEmpty(this.DimensionPropertyName))
-                {
-                    throw new NetChartException(Message.ErrorConfigurationAggregationWithoutGroup);
-                }
-                //HAY QUE VALIDAR EN LA AGRUPACION SI LAS PROPIEDADES TIENEN UN TIPO VALIDO, por ejemplo, si sumo, que sean numeros
+                throw new NetChartException(Message.ErrorConfigurationInvalidAggregation);
             }
 
+            //validar la propiedad secundaria y la agregacion
+            if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate && !this.DimensionProperty.IsDefined)
+            {
+                throw new NetChartException(Message.ErrorConfigurationAggregationWithoutGroup);
+            }
+
+            if (this.VariableProperty.DisplayType != VariableTypeEnum.Discrete
+                && this.VariableProperty.DisplayType != VariableTypeEnum.Continuous)
+            {
+                if (this.VariableProperty.Aggregation == AggregateEnum.Sum
+                    || this.VariableProperty.Aggregation == AggregateEnum.Average)
+                {
+                    throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
+                }
+            }
+
+            if (this.DimensionProperty.DisplayType != VariableTypeEnum.Discrete
+                && this.DimensionProperty.DisplayType != VariableTypeEnum.Continuous)
+            {
+                if (this.DimensionProperty.Aggregation == AggregateEnum.Sum
+                    || this.DimensionProperty.Aggregation == AggregateEnum.Average)
+                {
+                    throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
+                }
+            }
         }
 
         /// <summary>
@@ -265,7 +278,8 @@ namespace NetChart
             //TODO: este if se puede refactorizar, los dos else internos son iguales
             if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
             {
-                if (!string.IsNullOrEmpty(this.DimensionPropertyName))
+                //if (!string.IsNullOrEmpty(this.DimensionPropertyName))
+                if(this.DimensionProperty.IsDefined)
                 {
                     //no es nula la dimension, para cada valor de dimension hacer un grupo, en dimension poner la llave del 
                     //grupo, y en variable el valor del agregado. Poner todos los elementos del grupo en la propiedad outputdetail.DATA
@@ -301,7 +315,8 @@ namespace NetChart
             {
                 //caso de no agregacion
 
-                if (!string.IsNullOrEmpty(this.DimensionPropertyName))
+                //if (!string.IsNullOrEmpty(this.DimensionPropertyName))
+                if(this.DimensionProperty.IsDefined)
                 {
                     //no es nula la dimension, hace falta sacar los valores de dimension y de variable, 
                     //Poner todos los elementos del grupo en la propiedad outputdetail.DATA
@@ -409,14 +424,16 @@ namespace NetChart
 
             //TODO: Hacer un arbol con las propiedades y meterlo en el documento del TFM
             //VariableTypeEnum mainDisplayType = this.VariableProperty.DisplayType;
-            VariableTypeEnum dimensionDisplayType = VariableTypeEnum.Discrete;
+            //VariableTypeEnum dimensionDisplayType = VariableTypeEnum.Discrete;
 
             //Si no esta definida toma el valor de la posicion => entero => discreto
             //AUNQUE NO ESTE DEFINIDA, siempre se usa la dimension
-            if (!string.IsNullOrEmpty(this.DimensionPropertyName))
-            {
-                dimensionDisplayType = DataHelper.GetPropertyDisplayType(WorkType, this.DimensionPropertyName);
-            }
+            //if (!string.IsNullOrEmpty(this.DimensionPropertyName))
+            //if(this.DimensionProperty.IsDefined)
+            //{
+            //    dimensionDisplayType = DataHelper.GetPropertyDisplayType(WorkType, this.DimensionPropertyName);
+            //}
+            VariableTypeEnum dimensionDisplayType = this.DimensionProperty.DisplayType;
 
             if (this.ZVariableProperty.IsDefined)
             {
@@ -437,7 +454,7 @@ namespace NetChart
                         break;
                     default:
                         throw new NotSupportedException();
-                }                
+                }
             }
             else
             {

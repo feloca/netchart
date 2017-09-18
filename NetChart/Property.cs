@@ -11,6 +11,11 @@ namespace NetChart
     /// </summary>
     public class Property<T> where T : class
     {
+        private string _name;
+        private AggregateEnum _aggregation;
+        private VariableTypeEnum _displayType;
+        private bool _isDisplayTypeManual = false;
+
         private Type WorkType
         {
             get
@@ -19,22 +24,9 @@ namespace NetChart
             }
         }
 
-        //llamar a la propiedad secundaria dimension, esta no es de este tipo => dimensionDataProperty
-        //a la propiedad principal dataproperty
-        //a la propiedad z zproperty
-
-        //tiene que ir tipado
-
-        //Name
-        //VariableType
-        //Aggregation
-
-        //IsDefined : bool
-
-        //privado WorkType
-        private string _name;
-        private AggregateEnum _aggregation;
-
+        /// <summary>
+        /// Obtiene o establece el nombre de la propiedad que contiene los datos de entre las disponibles en la clase T
+        /// </summary>
         public string Name
         {
             get
@@ -56,7 +48,7 @@ namespace NetChart
         }
 
         /// <summary>
-        /// 
+        /// Obtiene o establece el criterio de agregacion de los datos
         /// </summary>
         public AggregateEnum Aggregation
         {
@@ -74,23 +66,60 @@ namespace NetChart
         }
 
         /// <summary>
-        /// 
+        /// Obtiene el tipo de variable de representacion gráfica asociado al tipo de propiedad
         /// </summary>
+        /// <remarks>
+        /// 
+        /// </remarks>
         public VariableTypeEnum DisplayType
         {
+            //TODO: deberia soportar un set?, el usuario podria cambiar la forma en la que se interpreta la variable
+            //TODO: creo que lo correcto seria ofrecer un valor por defecto, pero si el usuario configura en el set este valor respetarlo
             get
             {
+                if (_isDisplayTypeManual)
+                {
+                    return _displayType;
+                }
+
                 if (this.IsDefined)
                 {
+                    //da igua que este agregada, porque el tipo resultado de la agregacion es el mismo que el de la propiedad sin agregar
+                    //salvo en el caso de contar que tendre siemrpe un valor entero
+                    //con tipos cadena no se puede sumar ni hacer la media, validado en el set
+                    if(this.Aggregation == AggregateEnum.Count)
+                    {
+                        return VariableTypeEnum.Discrete;
+                    }
+                                        
                     return DataHelper.GetPropertyDisplayType(WorkType, this.Name);
                 }
 
                 return VariableTypeEnum.Discrete;
             }
+            set
+            {
+                //todo: validar si es un string que no se establezcan los tipos invalidos
+                //basicamente si el tipo es un numero y lo tratamos como cadena puede dar 
+                //error al agregar
+                var realType = DataHelper.GetPropertyDisplayType(WorkType, this.Name);
+                if(realType != VariableTypeEnum.Discrete
+                    && realType != VariableTypeEnum.Continuous)
+                {
+                    if(value == VariableTypeEnum.Continuous ||
+                        value == VariableTypeEnum.Discrete)
+                    {
+                        throw new NetChartException(Message.ErrorConfigurationInvalidDisplayType);
+                    }
+                }
+
+                this._isDisplayTypeManual = true;
+                this._displayType = value;
+            }
         }
 
         /// <summary>
-        /// Obtiene si la propiedad ha sido definida
+        /// Obtiene si la propiedad ha sido definida o no
         /// </summary>
         public bool IsDefined
         {

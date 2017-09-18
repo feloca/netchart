@@ -183,8 +183,15 @@ namespace NetChart
         /// </remarks>
         public string Generate()
         {
-            //definir una clase para agrupar los datos.
             this.ValidateConfiguration();
+
+            //podria dejar que la lista de datos fuera null y crear un coleccion vacía pero de momento
+            //creo que seria datos == null y tipografico == debug cuando deberia de lanzar esta excepcion
+            //TODO: mirar el comentario anterior, tener un grafico por defecto con "no datos"
+            if (this.Data == null)
+            {
+                throw new NetChartException(Message.ErrorConfigurationNoData);
+            }
             var output = new Output();
             output.ChartType = this.ChartType.ToString();
 
@@ -214,17 +221,19 @@ namespace NetChart
         private void ValidateConfiguration()
         {
             //TODO: no tengo claro que sea necesario validar la existencia de datos para poder decir si la configuración es correcta
-            if (this.Data == null)
-            {
-                throw new NetChartException(Message.ErrorConfigurationNoData);
-            }
+            //if (this.Data == null)
+            //{
+            //    throw new NetChartException(Message.ErrorConfigurationNoData);
+            //}
 
             if (!this.VariableProperty.IsDefined)
             {
                 throw new NetChartException(Message.ErrorConfigurationPropertyNameNull);
             }
 
-            if (this.VariableProperty.IsDefined && this.DimensionProperty.IsDefined)
+            if (this.VariableProperty.IsDefined && this.DimensionProperty.IsDefined
+                && this.ZVariableProperty.Aggregation != AggregateEnum.NoAggregate
+                && this.DimensionProperty.Aggregation != AggregateEnum.NoAggregate)
             {
                 throw new NetChartException(Message.ErrorConfigurationInvalidAggregation);
             }
@@ -235,6 +244,7 @@ namespace NetChart
                 throw new NetChartException(Message.ErrorConfigurationAggregationWithoutGroup);
             }
 
+            //valido que el tipo de la variable soporte la agregacion especificada
             if (this.VariableProperty.DisplayType != VariableTypeEnum.Discrete
                 && this.VariableProperty.DisplayType != VariableTypeEnum.Continuous)
             {
@@ -245,11 +255,24 @@ namespace NetChart
                 }
             }
 
+            //valido que el tipo de la dimension soporte la agregacion especificada
             if (this.DimensionProperty.DisplayType != VariableTypeEnum.Discrete
                 && this.DimensionProperty.DisplayType != VariableTypeEnum.Continuous)
             {
                 if (this.DimensionProperty.Aggregation == AggregateEnum.Sum
                     || this.DimensionProperty.Aggregation == AggregateEnum.Average)
+                {
+                    throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
+                }
+            }
+
+            //validamos la z si esta definida
+            if (this.ZVariableProperty.IsDefined 
+                && this.ZVariableProperty.DisplayType != VariableTypeEnum.Discrete
+                && this.ZVariableProperty.DisplayType != VariableTypeEnum.Continuous)
+            {
+                if (this.ZVariableProperty.Aggregation == AggregateEnum.Sum
+                    || this.ZVariableProperty.Aggregation == AggregateEnum.Average)
                 {
                     throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
                 }
@@ -423,16 +446,6 @@ namespace NetChart
             //                   -si tipo float o decimal -> recomendar linea
 
             //TODO: Hacer un arbol con las propiedades y meterlo en el documento del TFM
-            //VariableTypeEnum mainDisplayType = this.VariableProperty.DisplayType;
-            //VariableTypeEnum dimensionDisplayType = VariableTypeEnum.Discrete;
-
-            //Si no esta definida toma el valor de la posicion => entero => discreto
-            //AUNQUE NO ESTE DEFINIDA, siempre se usa la dimension
-            //if (!string.IsNullOrEmpty(this.DimensionPropertyName))
-            //if(this.DimensionProperty.IsDefined)
-            //{
-            //    dimensionDisplayType = DataHelper.GetPropertyDisplayType(WorkType, this.DimensionPropertyName);
-            //}
             VariableTypeEnum dimensionDisplayType = this.DimensionProperty.DisplayType;
 
             if (this.ZVariableProperty.IsDefined)
@@ -449,7 +462,8 @@ namespace NetChart
                         results.Add(ChartTypeEnum.Temperature.ToString());
                         break;
                     case VariableTypeEnum.Nominal:
-                        //TODO: No se que poner aqui, creo deberiamos de poner una etiqueta
+                        //TODO: No se que poner aqui, creo deberiamos de poner una etiqueta, ¿usar una gráfico de burbujas?
+                        //results.Add(ChartTypeEnum.Bubble.ToString());
                         throw new NotImplementedException();
                         break;
                     default:
@@ -461,95 +475,69 @@ namespace NetChart
                 switch (this.VariableProperty.DisplayType)
                 {
                     case VariableTypeEnum.Continuous:
+                        switch (this.DimensionProperty.DisplayType)
+                        {
+                            case VariableTypeEnum.Continuous:
+                                results.Add(ChartTypeEnum.Line.ToString());
+                                break;
+                            case VariableTypeEnum.Discrete:
+                                results.Add(ChartTypeEnum.Bar.ToString());
+                                results.Add(ChartTypeEnum.Pie.ToString());
+                                results.Add(ChartTypeEnum.Radar.ToString());
+                                break;
+                            case VariableTypeEnum.Nominal:
+                                results.Add(ChartTypeEnum.Bar.ToString());
+                                results.Add(ChartTypeEnum.Pie.ToString());
+                                results.Add(ChartTypeEnum.Radar.ToString());
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
                         break;
                     case VariableTypeEnum.Discrete:
+                        switch (this.DimensionProperty.DisplayType)
+                        {
+                            case VariableTypeEnum.Continuous:
+                                results.Add(ChartTypeEnum.Line.ToString());
+                                results.Add(ChartTypeEnum.Scatter.ToString()); //este no lo tengo claro
+                                break;
+                            case VariableTypeEnum.Discrete:
+                                results.Add(ChartTypeEnum.Scatter.ToString());
+                                break;
+                            case VariableTypeEnum.Nominal:
+                                results.Add(ChartTypeEnum.Bar.ToString());
+                                results.Add(ChartTypeEnum.Pie.ToString());
+                                results.Add(ChartTypeEnum.Radar.ToString());
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
                         break;
                     case VariableTypeEnum.Nominal:
+                        switch (this.DimensionProperty.DisplayType)
+                        {
+                            case VariableTypeEnum.Continuous:
+                            case VariableTypeEnum.Discrete:
+                            case VariableTypeEnum.Nominal:
+                                results.Add(ChartTypeEnum.Bubble.ToString());
+                                break;
+                            default:
+                                throw new NotSupportedException();
+                        }
                         break;
                     default:
                         throw new NotSupportedException();
                 }
-
-                //TODO: hacer un excel y cargarlo en tableau, usar los criterios recomendados
-                //asd AQUI ME HE QUEDADO, creo que la dimension tambien tiene que ser propiedad? o mirar el tipo
-                results.Add(ChartTypeEnum.Bar.ToString());
-                results.Add(ChartTypeEnum.Line.ToString());
-                results.Add(ChartTypeEnum.Pie.ToString());
-                results.Add(ChartTypeEnum.Radar.ToString());
-                results.Add(ChartTypeEnum.Scatter.ToString());
+                
+                //TODO: consultar esto con monitor o yussef
+                //results.Add(ChartTypeEnum.Bar.ToString());
+                //results.Add(ChartTypeEnum.Line.ToString());
+                //results.Add(ChartTypeEnum.Pie.ToString());
+                //results.Add(ChartTypeEnum.Radar.ToString());
+                //results.Add(ChartTypeEnum.Scatter.ToString());
             }
 
             return results.ToArray();
-
-            ////TODO: hacer un if para una variable, otro if para 2 variables y un if para las 3 variables
-            ////caso 1, solo usamos la variable principal
-            //if (useSecondProp == false && useZProp == false)
-            //{
-
-
-            //    return results.ToArray();
-            //}
-
-            ////caso 2, usamos la variable principal y la secundaria
-            //if (useSecondProp == true && useZProp == false)
-            //{
-            //    return results.ToArray();
-            //}
-
-            ////caso 3, usamos todas las variables, principal, secundaria y z
-            //if (useSecondProp == true && useZProp == true)
-            //{
-            //    return results.ToArray();
-            //}
-
-            //throw new NotSupportedException();
-
-            /*
-            if (this.Variable.Aggregation != AggregateEnum.NoAggregate)
-            {
-                if (mainDisplayType == VariableTypeEnum.Discrete)
-                {
-                    results.Add(ChartTypeEnum.Bar.ToString());
-                }
-                if (mainDisplayType == VariableTypeEnum.Continuous)
-                {
-                    results.Add(ChartTypeEnum.Line.ToString());
-                }
-                if (mainDisplayType == VariableTypeEnum.Discrete && secondDisplayType == VariableTypeEnum.Discrete)
-                {
-                    results.Add(ChartTypeEnum.Scatter.ToString());
-                }
-
-                ////si mainDisplayType es discreta o continua, y no existe segunda, meter grafico de tarta
-                //if(mainDisplayType == VariableTypeEnum.Nominal && useSecondProp == false)
-                //{
-                //    //meter grafico tarta
-                //}
-                //if (mainDisplayType == VariableTypeEnum.Continuous && useSecondProp == false)
-                //{
-                //    //meter gráfico tarta
-                //}
-
-                //if(mainDisplayType == VariableTypeEnum.Continuous && useSecondProp == true)
-                //{
-                //    if
-                //}
-
-                //hacer un if para la variable z
-
-
-            }
-            else
-            {
-                //por ser agregado automaticamente el tipo es discreto
-                mainDisplayType = VariableTypeEnum.Discrete;
-
-                //hacer un if para la variable z
-                results.Add(ChartTypeEnum.Bar.ToString());
-            }
-
-            return results.ToArray();
-            */
         }
 
     }

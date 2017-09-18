@@ -16,6 +16,6 @@ namespace NetChart
 
         public static string ErrorConfigurationAggregationWithoutGroup = "La propiedad [PropertyAggregation] define una función agregada pero no se ha indicado el campo de agrupación [SecondPropertyName].";
 
-
+        public static string ErrorConfigurationInvalidDisplayType = "La propiedad [DisplayType] cuyo tipo original es cadena no puede representarse mediante un formato numerico de tipo discreto o continuo";
     }
 }

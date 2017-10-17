@@ -1,0 +1,37 @@
+﻿@model IEnumerable<NetChart.Web.ViewModels.TestVM>
+
+@{
+    ViewBag.Title = "Index";
+}
+
+<h2>Listado de Pruebas</h2>
+
+<p>
+    @*@Html.ActionLink("Create New", "Create")*@
+</p>
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Description)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Method)
+        </th>
+        <th></th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Description)
+        </td>
+        <td>
+            @Html.ActionLink("Ver", @item.Method)
+            @*@Html.DisplayFor(modelItem => item.Method)*@
+        </td>
+        <td>
+        </td>
+    </tr>
+}
+
+</table>

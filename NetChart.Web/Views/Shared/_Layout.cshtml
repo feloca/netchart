@@ -23,6 +23,7 @@
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
                     <li>@Html.ActionLink("Inicio", "Index", "Home")</li>
+                    <li>@Html.ActionLink("Tests", "Index", "Test")</li>
                     <li>@Html.ActionLink("Acerca de", "About", "Home")</li>
                     <li>@Html.ActionLink("Contacto", "Contact", "Home")</li>
                 </ul>
@@ -40,6 +41,8 @@
 
     @Scripts.Render("~/bundles/jquery")
     @Scripts.Render("~/bundles/bootstrap")
+    <!--Cargo en la libreria gráfica aquí porque lo voy a usar en todas las vistas de prueba-->
+    @Scripts.Render("~/bundles/netchart")
     @RenderSection("scripts", required: false)
 </body>
 </html>

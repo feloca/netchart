@@ -11,6 +11,11 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetChart.Console", "NetChar
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "NetChart.GeneradorDatos", "NetChart.GeneradorDatos\NetChart.GeneradorDatos.csproj", "{0FB941D9-8EFF-406C-91EB-8A5AB2658C47}"
 EndProject
+Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "CommonJS", "CommonJS", "{3A2A25D8-0290-42E0-908C-3D3C661496C9}"
+	ProjectSection(SolutionItems) = preProject
+		NetChart.js = NetChart.js
+	EndProjectSection
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU

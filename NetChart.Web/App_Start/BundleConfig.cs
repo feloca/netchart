@@ -26,6 +26,10 @@ namespace NetChart.Web
             bundles.Add(new StyleBundle("~/Content/css").Include(
                       "~/Content/bootstrap.css",
                       "~/Content/site.css"));
+
+            // Cargo la parte cliente 
+            bundles.Add(new ScriptBundle("~/bundles/netchart").Include(
+                      "~/Scripts/netchart.js"));
         }
     }
 }

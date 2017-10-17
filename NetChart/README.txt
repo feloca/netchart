@@ -76,3 +76,19 @@ Hay que crear un generador de CSV para probar en tableau la logica, generar los 
 11/09/2017
 Definir un nuevo tipo dimensionProperty que herede de property y permitir definir intervalos -> pensar si es necesario, propiedades limites, y podría trabajar sin nombre de variable
 => aqui ando, he metido la propiedad para dimension y he ajustado la funcion de validaciones, hay que seguir revisando el uso de la propiedad dimension
+
+17/10/2017 => ESTO DEBERIA IR EN LA MEMORIA
+Como distribuir ficheros JS -> google "c# can i create a javascript files dll and use it on mvc"
+Primera opcion, meter los ficheros en la dll y en el cliente usar un helper que falsee una ruta web compartida y devuelva el fichero -> uso poco natural
+https://stackoverflow.com/questions/11842988/mvc-razor-include-js-css-files-from-another-project
+
+Crear una carpeta comun y lincar los ficheros a esta carpeta común -> creo que ahora mismo es lo más interesante, me encaja para el desarrollo
+https://stackoverflow.com/questions/8540292/how-do-you-share-scripts-among-multiple-projects-in-one-solution
+
+NOTA: La solución optima sería construir un paquete de nuget porque tengo una dll y un script, e instalarlo mediante el gestor de paquetes de nuget. 
+Pero esto llevaría un tiempo. No me vale bower o npm porque no solucionaria el tema de la dll.
+
+OJO,los links en debug no van porque no se crean bundles -> no crea el bundle correctamente, incluso en modo release. Lo copio
+https://stackoverflow.com/questions/17814965/bundling-a-linked-javascript-file
+
+Me he quedado montando el objeto nc de cliente

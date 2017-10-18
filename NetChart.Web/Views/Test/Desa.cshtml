@@ -7,12 +7,17 @@
 
 @*<script type="text/javascript" src="~/Scripts/NetChart.js"></script>*@
 
+<div id="cajaid">
+    <h1>Aqui va el gráfico</h1>
+</div>
+
 @section scripts{
     <script type="text/javascript">        
         $(function () {
-            //helloNetChart();
 
-            nc.saludar();
+            var datos = '{"ChartType": 0, "Suggestions": [0, 1, 2], "VariableData": [20, 40, 60], "DimensionData": [10, 30, 50], "ZVariableData": [5, 7, 9]}';
+            nc.select('#cajaid').draw(datos);
+
         });
     </script>
 }

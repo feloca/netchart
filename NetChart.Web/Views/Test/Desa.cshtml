@@ -1,23 +1,35 @@
 ﻿
 @{
+    Layout = null;
     ViewBag.Title = "Desa";
 }
 
 <h2>Desa</h2>
 
-@*<script type="text/javascript" src="~/Scripts/NetChart.js"></script>*@
+<script type="text/javascript" src="~/Scripts/NetChart.js"></script>
 
-<div id="cajaid">
-    <h1>Aqui va el gráfico</h1>
+
+<div id="cajaid" style="border:solid;width:700px;height:500px;">
+    <h1>Aquí va el gráfico</h1>
 </div>
 
-@section scripts{
+<script type="text/javascript">
+
+        window.onload = function () {
+
+            var datos = '{"ChartType": 1, "Suggestions": [0, 1, 2], "VariableData": [20, 40, 60], "DimensionData": [10, 30, 50], "ZVariableData": [5, 7, 9]}';
+            nc.select('#cajaid').draw(datos);
+
+        };
+</script>
+
+@*@section scripts{
     <script type="text/javascript">        
         $(function () {
 
-            var datos = '{"ChartType": 0, "Suggestions": [0, 1, 2], "VariableData": [20, 40, 60], "DimensionData": [10, 30, 50], "ZVariableData": [5, 7, 9]}';
+            var datos = '{"ChartType": 1, "Suggestions": [0, 1, 2], "VariableData": [20, 40, 60], "DimensionData": [10, 30, 50], "ZVariableData": [5, 7, 9]}';
             nc.select('#cajaid').draw(datos);
 
         });
     </script>
-}
+}*@

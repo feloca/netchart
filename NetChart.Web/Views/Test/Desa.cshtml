@@ -1,6 +1,6 @@
 ﻿
 @{
-    Layout = null;
+    //Layout = null;
     ViewBag.Title = "Desa";
 }
 
@@ -13,7 +13,7 @@
     <h1>Aquí va el gráfico</h1>
 </div>
 
-<script type="text/javascript">
+@*<script type="text/javascript">
 
         window.onload = function () {
 
@@ -21,15 +21,15 @@
             nc.select('#cajaid').draw(datos);
 
         };
-</script>
+</script>*@
 
-@*@section scripts{
+@section scripts{
     <script type="text/javascript">        
         $(function () {
 
             var datos = '{"ChartType": 1, "Suggestions": [0, 1, 2], "VariableData": [20, 40, 60], "DimensionData": [10, 30, 50], "ZVariableData": [5, 7, 9]}';
-            nc.select('#cajaid').draw(datos);
-
+            //nc.select('#cajaid').draw(datos);
+            nc.testManual(datos);
         });
     </script>
-}*@
+}

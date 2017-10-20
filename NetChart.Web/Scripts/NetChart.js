@@ -50,7 +50,7 @@
         var dataObj = JSON.parse(dataStr);
         //data_obj.ChartType;
         //data_obj.Suggestions; //[]
-        //data_obj.VariableData; //[] -> la y
+        //data_obj.VariableData; //[] -> la y -> ESTA ES LA PROPIEDAD PRINCIPAL, A TOMAR DE REFERENCIA EN TODOS LOS GRÁFICOS
         //data_obj.DimensionData; //[] -> la x
         //data_obj.ZVariableData; //[]
 
@@ -84,12 +84,15 @@
 
     function nc_drawBar(data) {
         //TODO: sacar la creación del svg a una funcion
-        var svg = nc_document.createElementNS(nc_svgns, 'svg');
-        nc_appendStyleAttribute(svg, 'width', '100%');
-        nc_appendStyleAttribute(svg, 'height', '100%');
+        //var svg = nc_document.createElementNS(nc_svgns, 'svg');
+        //nc_appendStyleAttribute(svg, 'width', '100%');
+        //nc_appendStyleAttribute(svg, 'height', '100%');
+        var svg = nc_getRootSVG();
 
         let svgHeight = nc_selection.clientHeight;
         let svgWidth = nc_selection.clientWidth;
+        let dataCount = data.VariableData.length; //OJO: si metemos titulo o ejes, habria que reservar espacio
+        //todo: meter porcentajes para que no toquen los bordes del contenedor
 
         //calcular la escala
         for (let i = 0; i < data.DimensionData.length; ++i) {
@@ -110,30 +113,42 @@
     //function nc_drawPie() { }
     //function nc_drawRadar() { }
 
+    //Añade un nodo hijo a un nodo
     function nc_appendChild(parentNode, childNode) {
         parentNode.appendChild(childNode);
     }
 
+    //Añade un atributo a un nodo
     function nc_appendAttribute(node, attrName, attrValue) {
         //node.hasAttribute(attrName) //TODO: mirar esto
-        var attr = nc_document.createAttribute(attrName);
+        let attr = nc_document.createAttribute(attrName);
         attr.value = attrValue;
         node.setAttributeNode(attr);
     }
 
+    //Añade un estilo a un nodo
     function nc_appendStyleAttribute(node, attrName, attrValue) {
         node.style[attrName] = attrValue;
     }
 
     //automatizar la creacion de las formas, rectangulos, burbujas, sectores, triangulos y lineas
     function nc_createRect(parentNode, x, y, width, height, color) {
-        var rect = nc_document.createElementNS(nc_svgns, 'rect');
+        let rect = nc_document.createElementNS(nc_svgns, 'rect');
         nc_appendAttribute(rect, 'x', x);
         nc_appendAttribute(rect, 'y', y);
         nc_appendAttribute(rect, 'width', width);
         nc_appendAttribute(rect, 'height', height);
         nc_appendAttribute(rect, 'fill', color);
         parentNode.appendChild(rect);
+    }
+
+    //Crea un svg con los estilos apropiados para ser el contenedor base del gráfico
+    function nc_getRootSVG() {
+        let svg = nc_document.createElementNS(nc_svgns, 'svg');
+        nc_appendStyleAttribute(svg, 'width', '100%');
+        nc_appendStyleAttribute(svg, 'height', '100%');
+
+        return svg;
     }
 
     //FUNCIONES AUXILIARES
@@ -143,7 +158,7 @@
 
     //Calcula el máximo de una colección
     function nc_maxValue(list) {
-        var max = null;
+        let max = null;
         if (list.length > 0) {
             max = list[0];
         }
@@ -155,9 +170,9 @@
         return max;
     }
 
-    //Calcula el minimo de una colección
+    //Calcula el mínimo de una colección
     function nc_minValue(list) {
-        var min = null;
+        let min = null;
         if (list.length > 0) {
             min = list[0];
         }
@@ -171,20 +186,24 @@
 
     //Crea una escala lineal
     function nc_createScaleLinear(domainMin, domainMax, rangeMin, rangeMax){
-        var scale = {
+        let scale = {
             domainMin: domainMin,
             domainMax: domainMax,
             rangeMin: rangeMin,
             rangeMax: rangeMax,
-            getValue: function (dataValue) {
-                //regla de 3
+            getDomainValue: function (rangeValue) {
+                //regla de 3 doble, primero calculo el porcentaje del rango y luego ese porcentaje sobre el valor equivalente en el dominio
+                let outputGap = domainMax - domainMin;
+                let inputGap = rangeMax - rangeMin;
+                let inputValue = rangeValue - rangeMin; //celda d3
+                
+                //calculo % sobre rango
+                let rangePercentage = (inputValue * 100) / inputGap;
 
-                var outputRange = domainMax - domainMin;
-                var inputRange = rangeMax - rangeMin;
-                var inputValue = dataValue - rangeMin;
-                //inputRange es el 100%
-                //AQUI ME HE QUEDADO
+                //calculo el valor equivalente sobre dominio
+                let domainValue = (rangePercentage * outputGap) / 100;
 
+                return domainMin + domainValue;
             }
         }
 
@@ -192,5 +211,16 @@
     }
 
     //FUNCIONES AUUXILIARES FIN
+
+    //BORRAR ESTA FUNCION, PRUEBAS
+    nc.testManual = function (dataStr) {
+        var dataObj = JSON.parse(dataStr);
+        var maximo = nc_maxValue(dataObj.DimensionData);
+        var minimo = nc_minValue(dataObj.DimensionData);
+
+        var escala = nc_createScaleLinear(200, 600, 25, 150);
+        var resultado = escala.getDomainValue(50);
+        alert('makumba');
+    }
 
 }(window);

@@ -26,8 +26,13 @@
 @section scripts{
     <script type="text/javascript">        
         $(function () {
+            //valores de los graficos ChartType
+            //0 - debug
+            //1 - barras
+            //2 - lineas
+            //3 - dispersión
 
-            var datos = '{"ChartType": 1, "Suggestions": [0, 1, 2], "VariableData": [20, 40, 60], "DimensionData": [10, 30, 50], "ZVariableData": [5, 7, 9]}';
+            var datos = '{"ChartType": 3, "Suggestions": [0, 1, 2], "VariableData": [40, 20, 60], "DimensionData": [10, 30, 50], "ZVariableData": [5, 7, 9]}';
             nc.select('#cajaid').draw(datos);
             //nc.testManual(datos);
         });

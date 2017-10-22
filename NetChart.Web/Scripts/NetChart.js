@@ -62,12 +62,16 @@
                 nc_drawChartBar(dataObj);
                 break;
             case 'Line':
+                nc_drawChartLine(dataObj);
                 break;
             case 'Scatter':
+                nc_drawChartScatter(dataObj);
                 break;
             case 'Bubble':
+                nc_drawChartBubble(dataObj);
                 break;
             case 'Temperature':
+                //nc_drawChartTemperature(dataObj);
                 break;
             case 'Pie':
                 break;
@@ -87,7 +91,7 @@
         //var svg = nc_document.createElementNS(nc_svgns, 'svg');
         //nc_appendStyleAttribute(svg, 'width', '100%');
         //nc_appendStyleAttribute(svg, 'height', '100%');
-        var svgRoot = nc_getSVGRoot();
+        let svgRoot = nc_getSVGRoot();
 
         let svgRootWidth = nc_selection.clientWidth;
         let svgRootHeight = nc_selection.clientHeight;
@@ -103,23 +107,22 @@
         //aqui me he quedado, creo que esta funcion podria poner el titulo y los ejes
         //function nc_createSVGChart(svgRoot, svgRootWidth, svgRootHeight, y data)
         let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
-        var chartWidth = svgChart.width.baseVal.value
-        var chartHeight = svgChart.height.baseVal.value;
+        let chartWidth = svgChart.width.baseVal.value
+        let chartHeight = svgChart.height.baseVal.value;
         //alert(chartHeight);
 
         //let svgChart = nc_createSVG(svgRoot, chartX, chartY, chartWidth, chartHeight);
-        let maxRange = nc_maxValue(data.VariableData);
-        let minRange = nc_minValue(data.VariableData);
-        if (minRange > 0) {
-            minRange = 0;
+        let maxVariable = nc_maxValue(data.VariableData);
+        let minVariable = nc_minValue(data.VariableData);
+        if (minVariable > 0) {
+            minVariable = 0;
         }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
 
-        let scaleY = nc_createScaleLinear(0, chartHeight, minRange, maxRange)
+        let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable)
         //let columnCount = data.VariableData.length;
         let columnWidth = chartWidth / data.VariableData.length;
 
-        //calcular la escala
-        for (let i = 0; i < data.DimensionData.length; ++i) {
+        for (let i = 0; i < data.VariableData.length; ++i) {
             //let dDimension = data.DimensionData[i];
             //todo: falta meter la escala a x
             let dVariable = scaleY.getDomainValue(data.VariableData[i]);
@@ -129,7 +132,103 @@
         //Añado al final el nodo para evitar que el gráfico aparezca a golpes
         nc_selection.innerHTML = '';
         nc_selection.appendChild(svgRoot);
-        //nc_appendChild(nc_selection, svgRoot);
+    }
+
+    //Esta dibuja un gráfico de lineas
+    function nc_drawChartLine(data) {
+        let svgRoot = nc_getSVGRoot();
+        let svgRootWidth = nc_selection.clientWidth;
+        let svgRootHeight = nc_selection.clientHeight;
+        let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
+        let chartWidth = svgChart.width.baseVal.value
+        let chartHeight = svgChart.height.baseVal.value;
+
+        let maxVariable = nc_maxValue(data.VariableData);
+        let minVariable = nc_minValue(data.VariableData);
+        if (minVariable > 0) {
+            minVariable = 0;
+        }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
+
+        let maxDimension = nc_maxValue(data.DimensionData);
+        let minDimension = nc_minValue(data.DimensionData);
+
+        let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
+        let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
+        
+        //se usa variable y dimension
+        //todo: ¿gestionar un unico dato?, de momento solo 2 o mas, meter un if y pintar un punto o un recta de extremo a extremo
+        //aqui va el bucle de lineas
+        for (let i = 1; i < data.VariableData.length; ++i) {
+            let x1 = scaleX.getDomainValue(data.DimensionData[i - 1]);
+            let y1 = scaleY.getDomainValue(data.VariableData[i - 1]);
+            let x2 = scaleX.getDomainValue(data.DimensionData[i]);
+            let y2 = scaleY.getDomainValue(data.VariableData[i]);
+            nc_createLine(svgChart, x1, chartHeight - y1, x2, chartHeight - y2, 'teal');
+        }
+
+        nc_selection.innerHTML = '';
+        nc_selection.appendChild(svgRoot);
+    }
+
+    //Esta funcion dibuja un fráfico de dispersión
+    function nc_drawChartScatter(data) {
+        let svgRoot = nc_getSVGRoot();
+        let svgRootWidth = nc_selection.clientWidth;
+        let svgRootHeight = nc_selection.clientHeight;
+        let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
+        let chartWidth = svgChart.width.baseVal.value
+        let chartHeight = svgChart.height.baseVal.value;
+
+        let maxVariable = nc_maxValue(data.VariableData);
+        let minVariable = nc_minValue(data.VariableData);
+        if (minVariable > 0) {
+            minVariable = 0;
+        }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
+
+        let maxDimension = nc_maxValue(data.DimensionData);
+        let minDimension = nc_minValue(data.DimensionData);
+
+        let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
+        let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
+
+        //aquí van los puntos
+        for (let i = 0; i < data.VariableData.length; ++i) {
+            let x = scaleX.getDomainValue(data.DimensionData[i]);
+            let y = scaleY.getDomainValue(data.VariableData[i]);
+
+            nc_createCircle(svgChart, x, chartHeight - y, 5, 'teal');
+        }
+
+        nc_selection.innerHTML = '';
+        nc_selection.appendChild(svgRoot);
+    }
+
+    //Esta funcion dibuja un gráfico de burbujas
+    function nc_drawChartBubble(data) {
+        let svgRoot = nc_getSVGRoot();
+        let svgRootWidth = nc_selection.clientWidth;
+        let svgRootHeight = nc_selection.clientHeight;
+        let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
+        let chartWidth = svgChart.width.baseVal.value
+        let chartHeight = svgChart.height.baseVal.value;
+
+        let maxVariable = nc_maxValue(data.VariableData);
+        let minVariable = nc_minValue(data.VariableData);
+        if (minVariable > 0) {
+            minVariable = 0;
+        }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
+
+        let maxDimension = nc_maxValue(data.DimensionData);
+        let minDimension = nc_minValue(data.DimensionData);
+
+        let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
+        let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
+
+        //creo que hace glat la escala z, ¿pensar en el dominio?
+        //AQUI ME HE QUEDADO
+
+        nc_selection.innerHTML = '';
+        nc_selection.appendChild(svgRoot);
     }
 
 
@@ -151,7 +250,7 @@
 
         //434 y max, y coge 494
         let scaleY = nc_createScaleLinear(0, chartHeight, minRange, maxRange)
-        nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight);
+        nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
         for (let i = 0; i < data.VariableData.length; ++i) {
             nc_createText(parentSVG, chartX - 20,
                 chartHeight - scaleY.getDomainValue(data.VariableData[i]) + chartY,
@@ -159,11 +258,11 @@
         }
 
         //creamos el eje x
-        nc_createLine(parentSVG, chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight);
-        let columnWidth =chartWidth/data.DimensionData.length;
-        let columnCenter = columnWidth/2;
+        nc_createLine(parentSVG, chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight, 'black');
+        let columnWidth = chartWidth / data.DimensionData.length;
+        let columnCenter = columnWidth / 2;
         for (let i = 0; i < data.DimensionData.length; ++i) {
-            nc_createText(parentSVG, (i*columnWidth) + columnCenter, chartY + chartHeight + 15, data.DimensionData[i]);
+            nc_createText(parentSVG, (i * columnWidth) + columnCenter, chartY + chartHeight + 15, data.DimensionData[i]);
         }
 
         //creo el titulo
@@ -227,8 +326,20 @@
         return svgText;
     }
 
+    //Crea un circulo svg
+    function nc_createCircle(parentNode, x, y, r, color) {
+        let circle = nc_document.createElementNS(nc_svgns, 'circle');
+        nc_appendAttribute(circle, 'cx', x);
+        nc_appendAttribute(circle, 'cy', y);
+        nc_appendAttribute(circle, 'r', r);
+        nc_appendAttribute(circle, 'fill', color);
+
+        parentNode.appendChild(circle);
+        return circle;
+    }
+
     //Crea una linea svg
-    function nc_createLine(parentNode, x1, y1, x2, y2) {
+    function nc_createLine(parentNode, x1, y1, x2, y2, color) {
         let line = nc_document.createElementNS(nc_svgns, 'line');
         nc_appendAttribute(line, 'x1', x1);
         nc_appendAttribute(line, 'y1', y1);
@@ -238,9 +349,10 @@
         //tb va con estilos
         //nc_appendStyleAttribute(line, 'stroke', 'black');
         //nc_appendStyleAttribute(line, 'stroke-width', 2);
-        nc_appendAttribute(line, 'stroke', 'black');
+        nc_appendAttribute(line, 'stroke', color);
         nc_appendAttribute(line, 'stroke-width', 2);
         parentNode.appendChild(line);
+        return line;
     }
 
     //Crea un rectangulo svg
@@ -252,6 +364,7 @@
         nc_appendAttribute(rect, 'height', height);
         nc_appendAttribute(rect, 'fill', color);
         parentNode.appendChild(rect);
+        return rect;
     }
 
     //Crea un svg con los estilos apropiados para ser el contenedor base del gráfico
@@ -323,7 +436,7 @@
         return scale;
     }
 
-    //FUNCIONES AUUXILIARES FIN
+    //FUNCIONES AUXILIARES FIN
 
     //BORRAR ESTA FUNCION, PRUEBAS
     nc.testManual = function (dataStr) {

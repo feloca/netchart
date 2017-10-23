@@ -71,7 +71,7 @@
                 nc_drawChartBubble(dataObj);
                 break;
             case 'Temperature':
-                //nc_drawChartTemperature(dataObj);
+                nc_drawChartTemperature(dataObj);
                 break;
             case 'Pie':
                 break;
@@ -154,7 +154,7 @@
 
         let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
         let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
-        
+
         //se usa variable y dimension
         //todo: ¿gestionar un unico dato?, de momento solo 2 o mas, meter un if y pintar un punto o un recta de extremo a extremo
         //aqui va el bucle de lineas
@@ -221,16 +221,74 @@
         let maxDimension = nc_maxValue(data.DimensionData);
         let minDimension = nc_minValue(data.DimensionData);
 
+        let maxZVariable = nc_maxValue(data.ZVariableData);
+        let minZVariable = nc_minValue(data.ZVariableData);
+        if (minZVariable > 0) {
+            minZVariable = 0;
+        }//todo: lo mismo que con variable, hay que mirar los margenes
+
+        let chartZMax = chartHeight / 8; //hago que el tamaño de la burbuja sea como maximo el 25% de la altura (OJO que esto es el radio)
+
         let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
         let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
+        let scaleZ = nc_createScaleLinear(0, chartZMax, minZVariable, maxZVariable);
 
-        //creo que hace glat la escala z, ¿pensar en el dominio?
-        //AQUI ME HE QUEDADO
+        //creo que hace falta la escala z, ¿pensar en el dominio?
+        for (let i = 0; i < data.VariableData.length; ++i) {
+            let x = scaleX.getDomainValue(data.DimensionData[i]);
+            let y = scaleY.getDomainValue(data.VariableData[i]);
+            let r = scaleZ.getDomainValue(data.ZVariableData[i]);
+            nc_createCircle(svgChart, x, chartHeight - y, r, 'teal');
+        }
 
         nc_selection.innerHTML = '';
         nc_selection.appendChild(svgRoot);
     }
 
+    //Esta función dibuja un gráfico de temperatura
+    function nc_drawChartTemperature(data) {
+        let svgRoot = nc_getSVGRoot();
+        let svgRootWidth = nc_selection.clientWidth;
+        let svgRootHeight = nc_selection.clientHeight;
+        let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
+        let chartWidth = svgChart.width.baseVal.value
+        let chartHeight = svgChart.height.baseVal.value;
+
+        let maxVariable = nc_maxValue(data.VariableData);
+        let minVariable = nc_minValue(data.VariableData);
+        if (minVariable > 0) {
+            minVariable = 0;
+        }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
+
+        let maxDimension = nc_maxValue(data.DimensionData);
+        let minDimension = nc_minValue(data.DimensionData);
+
+        let maxZVariable = nc_maxValue(data.ZVariableData);
+        let minZVariable = nc_minValue(data.ZVariableData);
+        if (minZVariable > 0) {
+            minZVariable = 0;
+        }//todo: lo mismo que con variable, hay que mirar los margenes
+
+        //let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
+        //let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
+        let scaleZ = nc_createScaleLinear(0, 255, minZVariable, maxZVariable);
+       
+        //sacar los elementos distintos sin repetidos
+        //crear un nc_arrayScaleArray -> crear un nc_shortDistinct o dos
+        let rowHeight = chartHeight / ¿calcular los distintos valores?
+        let columnWidth = chartWidth / data.VariableData.length;
+
+        //nc_cloneDistinct
+        //nc_cloneSort
+
+        //aqui me he quedado
+        for (let i = 0; i < data.VariableData.length; ++i) {
+
+        }
+
+        nc_selection.innerHTML = '';
+        nc_selection.appendChild(svgRoot);
+    }
 
     //Crea el svg donde se dibuja el gráfico, ademas añade los ejes, leyendas y titulo
     function nc_createSVGChartLayout(parentSVG, width, height, data) {
@@ -381,6 +439,24 @@
     //max
     //min
     //scaleLinear
+
+    //Esta función devuelve un nuevo array ordenado
+    function nc_cloneSort(data){
+        let result = data.slice(0);
+        return result.sort();
+    }
+
+    //Esta función devuelve un nuevo array de elementos distintos
+    function nc_cloneDistinct(data){
+        let cloneData = data.slice(0);
+        let result = [];
+        for(let i = 0; i< cloneData.length; ++i){
+            if(result.indexOf(cloneData[i]) < 0){
+                result.push(cloneData[i]);
+            }
+        }
+        return result;
+    }
 
     //Calcula el máximo de una colección
     function nc_maxValue(list) {

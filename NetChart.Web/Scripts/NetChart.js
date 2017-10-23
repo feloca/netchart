@@ -74,6 +74,7 @@
                 nc_drawChartTemperature(dataObj);
                 break;
             case 'Pie':
+                nc_drawChartPie(dataObj);
                 break;
             case 'Radar':
                 break;
@@ -254,14 +255,8 @@
         let chartWidth = svgChart.width.baseVal.value
         let chartHeight = svgChart.height.baseVal.value;
 
-        let maxVariable = nc_maxValue(data.VariableData);
-        let minVariable = nc_minValue(data.VariableData);
-        if (minVariable > 0) {
-            minVariable = 0;
-        }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
-
-        let maxDimension = nc_maxValue(data.DimensionData);
-        let minDimension = nc_minValue(data.DimensionData);
+        let dimesionSteps = nc_distinct(nc_sort(data.DimensionData));
+        let variableSteps = nc_distinct(data.VariableData);
 
         let maxZVariable = nc_maxValue(data.ZVariableData);
         let minZVariable = nc_minValue(data.ZVariableData);
@@ -269,22 +264,45 @@
             minZVariable = 0;
         }//todo: lo mismo que con variable, hay que mirar los margenes
 
-        //let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
-        //let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
-        let scaleZ = nc_createScaleLinear(0, 255, minZVariable, maxZVariable);
-       
+        let scaleZ = nc_createScaleLinear(0, 1, minZVariable, maxZVariable);
+
         //sacar los elementos distintos sin repetidos
         //crear un nc_arrayScaleArray -> crear un nc_shortDistinct o dos
-        let rowHeight = chartHeight / ¿calcular los distintos valores?
-        let columnWidth = chartWidth / data.VariableData.length;
 
-        //nc_cloneDistinct
-        //nc_cloneSort
+        let rowHeight = chartHeight / variableSteps.length;
+        let columnWidth = chartWidth / dimesionSteps.length;
 
-        //aqui me he quedado
-        for (let i = 0; i < data.VariableData.length; ++i) {
+        for (let i = 0; i < dimesionSteps.length; ++i) {
+            for (let j = 0; j < data.DimensionData.length; ++j) {
+                if (data.DimensionData[j] == dimesionSteps[i]) {
+                    //dibujar la y y la z
+                    let x = i;
+                    let y = variableSteps.indexOf(data.VariableData[j]);
+                    let z = scaleZ.getDomainValue(data.ZVariableData[j]); //opacity
 
+                    let rect = nc_createRect(svgChart, x * columnWidth, chartHeight - (y * rowHeight) - rowHeight,
+                        columnWidth, rowHeight, 'teal');
+                    nc_appendAttribute(rect, 'fill-opacity', z);
+                }
+            }
         }
+
+        nc_selection.innerHTML = '';
+        nc_selection.appendChild(svgRoot);
+    }
+
+    //Esta función dibuja un gráfico de tarta
+    function nc_drawChartPie(data) {
+        let svgRoot = nc_getSVGRoot();
+        let svgRootWidth = nc_selection.clientWidth;
+        let svgRootHeight = nc_selection.clientHeight;
+        let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
+        let chartWidth = svgChart.width.baseVal.value
+        let chartHeight = svgChart.height.baseVal.value;
+
+        //AQUI ME HE QUEDADO
+        //https://stackoverflow.com/questions/32750613/svg-draw-a-circle-with-4-sectors
+        //https://jbkflex.wordpress.com/2011/07/28/creating-a-svg-pie-chart-html5/
 
         nc_selection.innerHTML = '';
         nc_selection.appendChild(svgRoot);
@@ -441,17 +459,17 @@
     //scaleLinear
 
     //Esta función devuelve un nuevo array ordenado
-    function nc_cloneSort(data){
+    function nc_sort(data) {
         let result = data.slice(0);
         return result.sort();
     }
 
     //Esta función devuelve un nuevo array de elementos distintos
-    function nc_cloneDistinct(data){
+    function nc_distinct(data) {
         let cloneData = data.slice(0);
         let result = [];
-        for(let i = 0; i< cloneData.length; ++i){
-            if(result.indexOf(cloneData[i]) < 0){
+        for (let i = 0; i < cloneData.length; ++i) {
+            if (result.indexOf(cloneData[i]) < 0) {
                 result.push(cloneData[i]);
             }
         }

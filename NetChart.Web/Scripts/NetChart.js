@@ -21,6 +21,12 @@
     //Estos valores deben corresponderse con el enumerado ChartTypeEnum
     const nc_types = ['Debug', 'Bar', 'Line', 'Scatter', 'Bubble', 'Temperature', 'Pie', 'Radar'];
 
+    //Paleta de colores por defecto -> 14
+    const nc_colors = ['navy', 'blue', 'aqua', 'teal', 'olive', 'green', 'lime', 'yellow', 'orange', 'red', 'maroon', 'fuchsia', 'purple', 'gray'];
+
+    //Color actual de la paleta
+    var nc_currentColor = 0;
+
     //funcion para GUI de sugerencias
 
     //funcion para seleccionar el contenedor?, que admita tambien this (sin parametros)?
@@ -303,6 +309,47 @@
         //AQUI ME HE QUEDADO
         //https://stackoverflow.com/questions/32750613/svg-draw-a-circle-with-4-sectors
         //https://jbkflex.wordpress.com/2011/07/28/creating-a-svg-pie-chart-html5/
+        //solo trabajo con variabledata
+
+        //todo: hay que sumar los valores en funcion de la dimension, es decir, si existe una dimensión repetida sumar sus valores
+
+        //calculamos el monto total de los datos
+        let totalData = 0;
+        for (let i = 0; i < data.VariableData.length; ++i) {
+            totalData = totalData + Math.abs(data.VariableData[i]);
+        }
+
+        //calculamos el angulo correspondiente a cada dato en función 
+        let angles = [];
+        for (let i = 0; i < data.VariableData.length; ++i) {
+            //let angle = Math.ceil(360 * Math.abs(data.VariableData[i]) / totalData);
+            let angle = 360 * (Math.abs(data.VariableData[i]) / totalData);
+            angles.push(angle);
+        }
+
+        //calcular el centro y el radio
+        let centerX = chartWidth / 2;
+        let centerY = chartHeight / 2;
+        let radius = centerY;
+        if (centerX < centerY) {
+            radius = centerX;
+        }
+
+        let startAngle = 0;
+        let endAngle = 0;
+
+        for (let i = 0; i < angles.length; ++i) {
+            startAngle = endAngle;
+            endAngle = startAngle + angles[i];
+
+            x1 = parseFloat(centerX + radius * Math.cos(Math.PI * startAngle / 180));
+            y1 = parseFloat(centerY + radius * Math.sin(Math.PI * startAngle / 180));
+
+            x2 = parseFloat(centerX + radius * Math.cos(Math.PI * endAngle / 180));
+            y2 = parseFloat(centerY + radius * Math.sin(Math.PI * endAngle / 180));
+
+            nc_createPathSector(svgChart, centerX, centerY, radius, x1, y1, x2, y2, nc_nextColor());
+        }
 
         nc_selection.innerHTML = '';
         nc_selection.appendChild(svgRoot);
@@ -391,6 +438,23 @@
 
     //automatizar la creacion de las formas, rectangulos, burbujas, sectores, triangulos y lineas
 
+    //Crea un path con forma de sector
+    function nc_createPathSector(parentNode, cx, cy, r, x1, y1, x2, y2, color) {
+        let path = nc_document.createElementNS('http://www.w3.org/2000/svg', 'path');
+
+        let d = "M" + cx + "," + cy + "  L" + x1 + "," + y1 +
+            " A" + r + "," + r + " 0 0,1 " + x2 + "," + y2 + " z"; //1 means clockwise
+        //alert(d);
+        //arc = paper.path(d);
+        nc_appendAttribute(path, 'd', d);
+        nc_appendAttribute(path, 'fill', color);
+        //arc.setAttribute('d', d);
+        //arc.setAttribute('fill', color);
+
+        parentNode.appendChild(path);
+        return path;
+    }
+
     //Crea un texto svg
     function nc_createText(parentNode, x, y, text) {
         let svgText = nc_document.createElementNS(nc_svgns, 'text');
@@ -457,6 +521,14 @@
     //max
     //min
     //scaleLinear
+
+    //Esta función devuelve el siguiente color de la paleta
+    function nc_nextColor() {
+        if (nc_currentColor > nc_colors.length) {
+            nc_currentColor = 0;
+        }
+        return nc_colors[nc_currentColor++];
+    }
 
     //Esta función devuelve un nuevo array ordenado
     function nc_sort(data) {

@@ -83,6 +83,7 @@
                 nc_drawChartPie(dataObj);
                 break;
             case 'Radar':
+                nc_drawChartRadar(dataObj);
                 break;
             default:
                 break;
@@ -350,6 +351,23 @@
 
             nc_createPathSector(svgChart, centerX, centerY, radius, x1, y1, x2, y2, nc_nextColor());
         }
+
+        nc_selection.innerHTML = '';
+        nc_selection.appendChild(svgRoot);
+    }
+
+    //Esta función dibuja un gráfico de radar
+    function nc_drawChartRadar(data) {
+        let svgRoot = nc_getSVGRoot();
+        let svgRootWidth = nc_selection.clientWidth;
+        let svgRootHeight = nc_selection.clientHeight;
+        let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
+        let chartWidth = svgChart.width.baseVal.value
+        let chartHeight = svgChart.height.baseVal.value;
+
+        //Aqui me quede, sacar el numero de x total, 
+        //sacar el maximo de y, calcular las distintas porciones,
+        //calcular la interseccion del radio sobre sobre la recta
 
         nc_selection.innerHTML = '';
         nc_selection.appendChild(svgRoot);

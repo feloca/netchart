@@ -369,6 +369,66 @@
         //sacar el maximo de y, calcular las distintas porciones,
         //calcular la interseccion del radio sobre sobre la recta
 
+        //calculamos el angulo correspondiente a cada dato en función 
+        let angles = [];
+        angles.push(0);
+        for (let i = 1; i < data.VariableData.length; ++i) {
+            //let angle = Math.ceil(360 * Math.abs(data.VariableData[i]) / totalData);
+            let angle = (360 / data.VariableData.length) * i;
+            angles.push(angle);
+        }
+
+        //calcular el centro y el radio
+        let centerX = chartWidth / 2;
+        let centerY = chartHeight / 2;
+
+        //REVISAR ESTO, EL RADIO SERIA LO MAXIMO, METER MEJOR UNA ESCALAY
+        let radius = centerY;
+        if (centerX < centerY) {
+            radius = centerX;
+        }
+       
+        let maxVariable = nc_maxValue(data.VariableData);
+        let minVariable = nc_minValue(data.VariableData);
+        if (minVariable > 0) {
+            minVariable = 0;
+        }
+
+        let scaleY = nc_createScaleLinear(0, radius, minVariable, maxVariable);
+
+        let startAngle = 0;
+        let endAngle = 0;
+        let startRadius = 0;
+        let endRadius = 0;
+
+        for (let i = 0; i < angles.length; ++i) {
+            startAngle = angles[i];
+            startRadius = scaleY.getDomainValue(data.VariableData[i]);
+            if (i < angles.length - 1) {
+                endAngle = angles[i + 1];
+                endRadius = scaleY.getDomainValue(data.VariableData[i+1]);
+            } else {
+                endAngle = angles[0];
+                endRadius = scaleY.getDomainValue(data.VariableData[0]);
+            }
+
+            //Dibujamos los ejes
+            axisX = parseFloat(centerX + radius * Math.cos(Math.PI * startAngle / 180));
+            axisY = parseFloat(centerY + radius * Math.sin(Math.PI * startAngle / 180));
+            nc_createLine(svgChart, centerX, centerY, axisX, axisY, 'black');
+
+            //Dibujamos las lineas del radar
+            let x1 = parseFloat(centerX + startRadius * Math.cos(Math.PI * startAngle / 180));
+            let y1 = parseFloat(centerY + startRadius * Math.sin(Math.PI * startAngle / 180));
+            let x2 = parseFloat(centerX + endRadius * Math.cos(Math.PI * endAngle / 180));
+            let y2 = parseFloat(centerY + endRadius * Math.sin(Math.PI * endAngle / 180));
+
+            nc_createLine(svgChart, x1, y1, x2, y2, 'teal');
+           
+            nc_createText(svgChart, axisX, axisY, data.DimensionData[i]);
+        }
+       // nc_createCircle(svgChart, centerX, centerY, 4, 'blue');
+
         nc_selection.innerHTML = '';
         nc_selection.appendChild(svgRoot);
     }

@@ -91,4 +91,5 @@ Pero esto llevaría un tiempo. No me vale bower o npm porque no solucionaria el 
 OJO,los links en debug no van porque no se crean bundles -> no crea el bundle correctamente, incluso en modo release. Lo copio
 https://stackoverflow.com/questions/17814965/bundling-a-linked-javascript-file
 
-Me he quedado montando el objeto nc de cliente
+31/10/2017
+en el script de js hace falta revisar el layout para que no incluya barras de ejes cuando el gráfico no lo requiera.

@@ -27,8 +27,6 @@
     //Color actual de la paleta
     var nc_currentColor = 0;
 
-    //funcion para GUI de sugerencias
-
     //funcion para seleccionar el contenedor?, que admita tambien this (sin parametros)?
     //busco unicamente un elemento, no trabajo con arrays
     //si me pasan el objeto dom lo empleo
@@ -90,17 +88,100 @@
         }
     }
 
-    function nc_drawChartDebug(data) {
-
+    //Esta función se encarga de redibujar los gráficos cuando el usuario selecciona una sugerencia
+    nc.debugSelection = function(combo, dataStr) {
+        //alert('no va mal ' + combo.value);
+        console.log('fn debugSelection');
+        console.log(dataStr);
+        var dataObj = dataStr;//JSON.parse(dataStr);
+        switch (nc_types[combo.value]) {
+            case 'Debug':
+                //Aqui hay que repetir la información de ayuda
+                nc_selection.innerHTML = '';
+                break;
+            case 'Bar':
+                nc_drawChartBar(dataObj);
+                break;
+            case 'Line':
+                nc_drawChartLine(dataObj);
+                break;
+            case 'Scatter':
+                nc_drawChartScatter(dataObj);
+                break;
+            case 'Bubble':
+                nc_drawChartBubble(dataObj);
+                break;
+            case 'Temperature':
+                nc_drawChartTemperature(dataObj);
+                break;
+            case 'Pie':
+                nc_drawChartPie(dataObj);
+                break;
+            case 'Radar':
+                nc_drawChartRadar(dataObj);
+                break;
+            default:
+                break;
+        }
     }
 
-    function nc_drawChartBar(data) {
-        //TODO: sacar la creación del svg a una funcion
-        //var svg = nc_document.createElementNS(nc_svgns, 'svg');
-        //nc_appendStyleAttribute(svg, 'width', '100%');
-        //nc_appendStyleAttribute(svg, 'height', '100%');
-        let svgRoot = nc_getSVGRoot();
+    //Esta función dibuja el control con las sugerencias y las opciones de configuración seleccionadas.
+    function nc_drawChartDebug(data) {
+        //data_obj.Suggestions;
+        let options = '';
+        for (let i = 0; i < data.Suggestions.length; ++i) {
+            options += '<option value="' + data.Suggestions[i] + '">' + nc_types[data.Suggestions[i]] + '</option>'
+        }
 
+        //todo: queda pendiente sacar la informacion de variable, dimension y zvariable
+
+        let divControl = nc_document.createElement('div');
+        divControl.innerHTML =
+                    '<h4><strong>NetChart</strong></h4>' +
+                    '<br/>' +
+                    '<div>' +
+                    '<label>Suggestion: </label>' +
+                    '<select onchange=\'nc.debugSelection(this, ' + JSON.stringify(data)+ ');\'>' + options +       
+			        '</select>' +
+                    '</div>' +
+                    '<br/>' +
+                    '<h4>Current configuration</h4>' +
+                    '<fieldset>' +
+                    //'    <legend>Current configuration</legend>' +
+                    '<div> ' +
+                    '        <label>Variable: </label>' +
+                    '        Nominal - SUM                ' +
+                    '</div>' +
+                    '<div>' +
+                    '    <label>Dimension: </label>' +
+                    '    Discrete                ' +
+                    '</div>' +
+                    '<div>' +
+                    '    <label>ZVariable: </label>' +
+                    '    No defined  ' +
+                    '</div>' +
+                    '</fieldset>';
+
+
+        //padding:.5em; NO FUNCIONA, los estilos en svg se asignan distinto de los ELEMENT, lo pongo como atributo
+        //nc_appendStyleAttribute(divControl, "padding", "2em;"); 
+        nc_appendAttribute(divControl, "style", "padding:.5em;float:left;");
+
+        nc_selection.innerHTML = '';
+        nc_selection.appendChild(divControl);
+        
+        let divChart = nc_document.createElement('div');        
+        nc_appendAttribute(divChart, "style", "width:"+(nc_selection.clientWidth - divControl.clientWidth - 5)+"px;height:100%;float:right;");
+        divChart.innerHTML='<p>Aqui hay que poner una nota informativa</p>'
+        nc_selection.appendChild(divChart);
+
+        //ahora dibujo los gráficos en un subespacio.
+        nc_selection = divChart;
+    }
+
+    //Esta función dibuja un gráfico de barras vertical
+    function nc_drawChartBar(data) {
+        let svgRoot = nc_getSVGRoot();
         let svgRootWidth = nc_selection.clientWidth;
         let svgRootHeight = nc_selection.clientHeight;
 

@@ -95,9 +95,8 @@
         console.log(dataStr);
         var dataObj = dataStr;//JSON.parse(dataStr);
         switch (nc_types[combo.value]) {
-            case 'Debug':
-                //Aqui hay que repetir la información de ayuda
-                nc_selection.innerHTML = '';
+            case 'Debug':                
+                nc_selection.innerHTML = nc_debugInformation(dataObj);
                 break;
             case 'Bar':
                 nc_drawChartBar(dataObj);
@@ -140,7 +139,7 @@
                     '<h4><strong>NetChart</strong></h4>' +
                     '<br/>' +
                     '<div>' +
-                    '<label>Suggestion: </label>' +
+                    '<label>Suggestions: </label>' +
                     '<select onchange=\'nc.debugSelection(this, ' + JSON.stringify(data)+ ');\'>' + options +       
 			        '</select>' +
                     '</div>' +
@@ -151,6 +150,7 @@
                     '<div> ' +
                     '        <label>Variable: </label>' +
                     '        Nominal - SUM                ' +
+                    '</br>ESTO ESTA HARDCODEADO ' +
                     '</div>' +
                     '<div>' +
                     '    <label>Dimension: </label>' +
@@ -172,11 +172,39 @@
         
         let divChart = nc_document.createElement('div');        
         nc_appendAttribute(divChart, "style", "width:"+(nc_selection.clientWidth - divControl.clientWidth - 5)+"px;height:100%;float:right;");
-        divChart.innerHTML='<p>Aqui hay que poner una nota informativa</p>'
+        divChart.innerHTML = nc_debugInformation(data);//'<p>Aqui hay que poner una nota informativa</p>';
         nc_selection.appendChild(divChart);
 
         //ahora dibujo los gráficos en un subespacio.
         nc_selection = divChart;
+    }
+
+    //Esta función muestra la información de la pantalla de entrada
+    function nc_debugInformation(data) {
+        let info =
+            '<h4>Please, select a suggestion</h4>' +
+            '<br/>' +
+            '<h4>Current configuration</h4>' +
+            '<fieldset>' +
+            //'    <legend>Current configuration</legend>' +
+            '<div> ' +
+            '        <label>Variable: </label>' +
+            '        Nominal - SUM                ' +
+            '</br>ESTO ESTA HARDCODEADO ' +
+            '</div>' +
+            '<div>' +
+            '    <label>Dimension: </label>' +
+            '    Discrete                ' +
+            '</div>' +
+            '<div>' +
+            '    <label>ZVariable: </label>' +
+            '    No defined  ' +
+            '</div>' +
+            '</fieldset>';
+        //todo: aqui poner un bucle con una descripción de cada gráfico ofertado, o mejor aun, poner uinformacion
+        //de los tipos de datos, y en la barra lateral una descripcion del gráfico seleccionado
+
+        return info;
     }
 
     //Esta función dibuja un gráfico de barras vertical

@@ -18,6 +18,21 @@ namespace NetChart
         /// </summary>
         public string[] Suggestions { get; set; }
 
+        /// <summary>
+        /// Obtiene o establece información de depuración de la propiedad "variable", unicamente disponible para ChartType.Debug
+        /// </summary>
+        public string VariableInfo { get; set; }
+
+        /// <summary>
+        /// Obtiene o establece información de depuración de la propiedad "dimension", unicamente disponible para ChartType.Debug
+        /// </summary>
+        public string DimensionInfo { get; set; }
+
+        /// <summary>
+        /// Obtiene o establece información de depuración de la propiedad "zvariable", unicamente disponible para ChartType.Debug
+        /// </summary>
+        public string ZVariableInfo { get; set; }
+
         //incluir propiedades de presentacion, usar una subclase para agruparlo
 
         //public object[] ComputedPropertyData { get; set; }

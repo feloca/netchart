@@ -196,14 +196,39 @@ namespace NetChart
             output.ChartType = this.ChartType.ToString();
 
             if (this.ChartType == ChartTypeEnum.Debug)
-            {
-                //TODO: meter sugerencias
+            {                
                 output.Suggestions = this.GetSuggestions();
+                output.VariableInfo = this.GetPropertyDebugInfo(this.VariableProperty);
+                output.DimensionInfo = this.GetPropertyDebugInfo(this.DimensionProperty);
+                output.ZVariableInfo = this.GetPropertyDebugInfo(this.ZVariableProperty);
             }
-
-            //TODO: pendiente gestionar las 3 variables posible, de manera similar al caso de las sugerencias, hay que meterlo tambien en el tipo output
+            
             this.AddOutputData(output);
             string result = (new JavaScriptSerializer()).Serialize(output);
+            return result;
+        }
+
+        /// <summary>
+        /// Obtiene un texto descriptivo de la propiedad indicada
+        /// </summary>
+        /// <param name="property"></param>
+        /// <returns></returns>
+        private string GetPropertyDebugInfo(Property<T> property)
+        {
+            var result = string.Empty;
+            if (property.IsDefined)
+            {
+                result = property.Name;
+                if(property.Aggregation != AggregateEnum.NoAggregate)
+                {
+                    result += " (" + property.Aggregation.ToString() + ")";
+                }
+                result += " - " + property.DisplayType.ToString();
+            }
+            else
+            {
+                result = "Not defined";
+            }
             return result;
         }
 

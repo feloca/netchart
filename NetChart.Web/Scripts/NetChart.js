@@ -93,31 +93,41 @@
         //alert('no va mal ' + combo.value);
         console.log('fn debugSelection');
         console.log(dataStr);
+        var chartInfo = nc_document.getElementsByClassName('nc_chart_info')[0];
         var dataObj = dataStr;//JSON.parse(dataStr);
         switch (nc_types[combo.value]) {
             case 'Debug':                
                 nc_selection.innerHTML = nc_debugInformation(dataObj);
+                chartInfo.innerHTML = 'Seleccione el grafico que mejor se ajuste al objetivo deseado';
                 break;
             case 'Bar':
                 nc_drawChartBar(dataObj);
+                chartInfo.innerHTML = '<span display="block">El grafico de barras permite representar: comparacion, distribucion y composicion</span>';
                 break;
             case 'Line':
                 nc_drawChartLine(dataObj);
+                chartInfo.innerHTML = 'El grafico de lineas permite representar: comparacion, distribucion y composicion';
                 break;
             case 'Scatter':
                 nc_drawChartScatter(dataObj);
+                chartInfo.innerHTML = 'El grafico de dispersion permite representar: distribucion y relacion';
                 break;
             case 'Bubble':
                 nc_drawChartBubble(dataObj);
+                chartInfo.innerHTML = 'El grafico de burbujas permite representar: relacion';
                 break;
             case 'Temperature':
                 nc_drawChartTemperature(dataObj);
+                //todo: completar descripcion gráficos pendientes
+                chartInfo.innerHTML = 'El grafico de temperatura permite representar: ';
                 break;
             case 'Pie':
                 nc_drawChartPie(dataObj);
+                chartInfo.innerHTML = 'El frafico de tarta permite representar: composicion';
                 break;
             case 'Radar':
                 nc_drawChartRadar(dataObj);
+                chartInfo.innerHTML = 'El grafico de radar permite representar: comparacion';
                 break;
             default:
                 break;
@@ -144,23 +154,24 @@
 			        '</select>' +
                     '</div>' +
                     '<br/>' +
-                    '<h4>Current configuration</h4>' +
-                    '<fieldset>' +
-                    //'    <legend>Current configuration</legend>' +
-                    '<div> ' +
-                    '        <label>Variable: </label>' +
-                    '        Nominal - SUM                ' +
-                    '</br>ESTO ESTA HARDCODEADO ' +
-                    '</div>' +
-                    '<div>' +
-                    '    <label>Dimension: </label>' +
-                    '    Discrete                ' +
-                    '</div>' +
-                    '<div>' +
-                    '    <label>ZVariable: </label>' +
-                    '    No defined  ' +
-                    '</div>' +
-                    '</fieldset>';
+                    '<h4>Chart description</h4>' +
+                    '<div class="nc_chart_info">Seleccione el grafico que mejor se ajuste al objetivo deseado</div>'
+                    //'<fieldset>' +
+                    ////'    <legend>Current configuration</legend>' +
+                    //'<div> ' +
+                    //'        <label>Variable: </label>' +
+                    //'        Nominal - SUM                ' +
+                    //'</br>ESTO ESTA HARDCODEADO ' +
+                    //'</div>' +
+                    //'<div>' +
+                    //'    <label>Dimension: </label>' +
+                    //'    Discrete                ' +
+                    //'</div>' +
+                    //'<div>' +
+                    //'    <label>ZVariable: </label>' +
+                    //'    No defined  ' +
+                    //'</div>' +
+                    //'</fieldset>';
 
 
         //padding:.5em; NO FUNCIONA, los estilos en svg se asignan distinto de los ELEMENT, lo pongo como atributo
@@ -181,7 +192,7 @@
 
     //Esta función muestra la información de la pantalla de entrada
     function nc_debugInformation(data) {
-        let info =
+        let result =
             '<h4>Please, select a suggestion</h4>' +
             '<br/>' +
             '<h4>Current configuration</h4>' +
@@ -189,22 +200,19 @@
             //'    <legend>Current configuration</legend>' +
             '<div> ' +
             '        <label>Variable: </label>' +
-            '        Nominal - SUM                ' +
-            '</br>ESTO ESTA HARDCODEADO ' +
+            data.VariableInfo +
             '</div>' +
             '<div>' +
             '    <label>Dimension: </label>' +
-            '    Discrete                ' +
+            data.DimensionInfo +
             '</div>' +
             '<div>' +
             '    <label>ZVariable: </label>' +
-            '    No defined  ' +
+            data.ZVariableInfo +
             '</div>' +
             '</fieldset>';
-        //todo: aqui poner un bucle con una descripción de cada gráfico ofertado, o mejor aun, poner uinformacion
-        //de los tipos de datos, y en la barra lateral una descripcion del gráfico seleccionado
 
-        return info;
+        return result;
     }
 
     //Esta función dibuja un gráfico de barras vertical

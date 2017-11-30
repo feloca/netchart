@@ -231,6 +231,10 @@
       <Project>{0fb941d9-8eff-406c-91eb-8a5ab2658c47}</Project>
       <Name>NetChart.GeneradorDatos</Name>
     </ProjectReference>
+    <ProjectReference Include="..\NetChart\NetChart.csproj">
+      <Project>{FC8E39C6-D3EC-40FD-B803-8E960DC20547}</Project>
+      <Name>NetChart</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

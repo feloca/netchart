@@ -16,13 +16,13 @@ namespace NetChart
         //calcular regla, es decir, dado un minimo y un maximo y un salto devolver un array con los valores generados
         public void Test()
         {
-            Func<int,bool> miFuncion = null;
+            Func<int, bool> miFuncion = null;
 
             List<int> lista = new List<int>();
             lista.AddRange(new int[] { 4, 5, 6 });
 
             var result = lista.Where(x => x == 5);
-          
+
             lista.Where(miFuncion);
 
             IQueryable<int> fq = null;
@@ -44,7 +44,7 @@ namespace NetChart
         public static PropertyInfo[] GetProperties(Type type)
         {
             var result = type.GetProperties();
-            return result;            
+            return result;
         }
 
         /// <summary>
@@ -65,10 +65,10 @@ namespace NetChart
         /// <param name="type"></param>
         /// <returns></returns>
         public static List<string> GetPropertyNames(Type type)
-        {            
+        {
             var result = new List<string>();
             var properties = GetProperties(type);
-            foreach(var property in properties)
+            foreach (var property in properties)
             {
                 result.Add(property.Name);
             }
@@ -105,7 +105,44 @@ namespace NetChart
             //sacar la propiedad y el tipo, si son tipos basicos directo, 
             //si es un enumerado ordinal
             //si es un objeto? => usar ordinal y to string?
-            throw new NotImplementedException();
+            //throw new NotImplementedException();
+            var property = GetProperty(type, propertyName);
+            Type propertyType = property.PropertyType;
+                                
+            if (propertyType.IsEnum)
+            {
+                return VariableTypeEnum.Ordinal;
+            }
+
+            //var int16 = (Int16.MinValue).GetType().Name;
+            //var int32 = (Int32.MinValue).GetType().Name;
+            //var int64 = (Int64.MinValue).GetType().Name;
+
+            //var _float = (Single.MinValue).GetType().Name;
+            //var _decimal = (Decimal.MinValue).GetType().Name;
+            //var _double = (Double.MinValue).GetType().Name;
+
+            //var _bool = (true).GetType().Name;
+            //var _string = ("hola").GetType().Name;
+
+            switch (propertyType.Name)
+            {
+                case "Boolean":
+                case "Int16":
+                case "Int32":
+                case "Int64":
+                    return VariableTypeEnum.Discrete;
+                case "Single":
+                case "Decimal":
+                case "Double":
+                    return VariableTypeEnum.Continuous;
+                case "String":
+                    return VariableTypeEnum.Nominal;
+                default:
+                    //TODO: no estan definidos los unsigned
+                    //TODO: escapa del ambito inicial del trabajo gestionar variables con clases
+                    throw new NotSupportedException();
+            }
         }
 
         /// <summary>
@@ -232,7 +269,7 @@ namespace NetChart
                     result = data.Max(x => (long)property.GetValue(x));
                     break;
                 case "String":
-                    result = data.Max(x=> (string)property.GetValue(x));
+                    result = data.Max(x => (string)property.GetValue(x));
                     break;
                 default:
                     //var asd = property.PropertyType.Name;
@@ -327,7 +364,7 @@ namespace NetChart
 
             switch (property.PropertyType.Name)
             {
-                case "Float":                    
+                case "Float":
                     data.Select(x => (float)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
                     break;
                 case "Decimal":

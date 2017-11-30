@@ -1,9 +1,11 @@
-﻿using NetChart.GeneradorDatos;
+﻿using NetChart;
+using NetChart.GeneradorDatos;
 using NetChart.Web.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
+using System.Web.Helpers;
 using System.Web.Mvc;
 
 namespace NetChart.Web.Controllers
@@ -62,8 +64,18 @@ namespace NetChart.Web.Controllers
 
         public ActionResult TestBar()
         {
-            var datos = Generator.GenerarPersonas();
-            return View();
+            var data = Generator.GenerarPersonas();
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Debug;
+            chart.VariablePropertyName = "Altura";
+            //chart.VariableProperty.Aggregation;
+            chart.DimensionPropertyName = "Nacionalidad";
+            //chart.DimensionProperty.Aggregation;
+            //chart.ZVariablePropertyName;
+            //chart.ZVariableProperty.Aggregation;
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
         }
 
         public ActionResult TestLine()

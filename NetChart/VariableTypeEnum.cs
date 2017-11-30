@@ -11,7 +11,7 @@ namespace NetChart
         //discreta, continua, ordinal, nominal
         Discrete = 0,
         Continuous = 1,
-        Nominal = 2//,
-        //Ordinal = 3
+        Nominal = 2,
+        Ordinal = 3
     }
 }

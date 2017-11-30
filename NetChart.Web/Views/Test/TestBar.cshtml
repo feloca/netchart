@@ -7,8 +7,18 @@
 <h2>TestBar</h2>
 
 @*<p>
-    @Html.ActionLink("Create New", "Create")
-</p>*@
+        @Html.ActionLink("Create New", "Create")
+    </p>*@
+
+<div>
+    <div id="debugid" style="border:solid;width:700px;height:500px;float:left;">
+        <h1>Aquí va el gráfico de depuracion</h1>
+    </div>
+    <div id="resultid" style="border:solid;width:700px;height:500px;float:left;">
+        <h1>Aquí va el gráfico configurado</h1>
+    </div>
+</div>
+
 <table class="table">
     <tr>
         <th>
@@ -38,38 +48,46 @@
         @*<th></th>*@
     </tr>
 
-@foreach (var item in Model) {
-    <tr>
-        <td>
-            @Html.DisplayFor(modelItem => item.Edad)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Altura)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Peso)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Tension)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Nacionalidad)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Ocupacion)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Estudios)
-        </td>
-        <td>
-            @Html.DisplayFor(modelItem => item.Ingresos)
-        </td>
-        @*<td>
-            @Html.ActionLink("Edit", "Edit", new { id=item.PersonaId }) |
-            @Html.ActionLink("Details", "Details", new { id=item.PersonaId }) |
-            @Html.ActionLink("Delete", "Delete", new { id=item.PersonaId })
-        </td>*@
-    </tr>
-}
+    @foreach (var item in Model)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(modelItem => item.Edad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Altura)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Peso)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Tension)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Nacionalidad)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ocupacion)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Estudios)
+            </td>
+            <td>
+                @Html.DisplayFor(modelItem => item.Ingresos)
+            </td>
+            @*<td>
+                    @Html.ActionLink("Edit", "Edit", new { id=item.PersonaId }) |
+                    @Html.ActionLink("Details", "Details", new { id=item.PersonaId }) |
+                    @Html.ActionLink("Delete", "Delete", new { id=item.PersonaId })
+                </td>*@
+        </tr>
+    }
 
 </table>
+
+<script type="text/javascript">
+    $(function () {
+        nc.select('#debugid').draw(@ViewBag.nc_data);
+        nc.select('#resultid').draw(@ViewBag.nc_data);
+    });
+</script>

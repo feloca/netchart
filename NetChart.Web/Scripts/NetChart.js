@@ -48,7 +48,7 @@
         return nc;//probar esto
     }
 
-    //funcion que reciba el JSON 
+    //funcion que dibuja el grafico JS, reciba el JSON con los datos
     nc.draw = function (dataStr) {
         console.log('fn draw');
         var dataObj = JSON.parse(dataStr);

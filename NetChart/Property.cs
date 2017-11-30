@@ -85,7 +85,7 @@ namespace NetChart
                 if (this.IsDefined)
                 {
                     //da igua que este agregada, porque el tipo resultado de la agregacion es el mismo que el de la propiedad sin agregar
-                    //salvo en el caso de contar que tendre siemrpe un valor entero
+                    //salvo en el caso de contar que tendre siempre un valor entero
                     //con tipos cadena no se puede sumar ni hacer la media, validado en el set
                     if(this.Aggregation == AggregateEnum.Count)
                     {

@@ -213,6 +213,7 @@
     <Content Include="Views\Home\Index.cshtml" />
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Test\Desa.cshtml" />
+    <Content Include="Views\Test\TestBar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />
@@ -224,6 +225,12 @@
     <Content Include="packages.config" />
     <None Include="Project_Readme.html" />
     <Content Include="Scripts\jquery-1.10.2.min.map" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\NetChart.GeneradorDatos\NetChart.GeneradorDatos.csproj">
+      <Project>{0fb941d9-8eff-406c-91eb-8a5ab2658c47}</Project>
+      <Name>NetChart.GeneradorDatos</Name>
+    </ProjectReference>
   </ItemGroup>
   <PropertyGroup>
     <VisualStudioVersion Condition="'$(VisualStudioVersion)' == ''">10.0</VisualStudioVersion>

@@ -98,36 +98,73 @@
         switch (nc_types[combo.value]) {
             case 'Debug':                
                 nc_selection.innerHTML = nc_debugInformation(dataObj);
-                chartInfo.innerHTML = 'Seleccione el grafico que mejor se ajuste al objetivo deseado';
+                chartInfo.innerHTML = '';
                 break;
             case 'Bar':
                 nc_drawChartBar(dataObj);
-                chartInfo.innerHTML = '<span display="block">El grafico de barras permite representar: comparacion, distribucion y composicion</span>';
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Comparison</li>' +
+                                    '<li>Distribution</li>' +
+                                    '<li>Composition</li>' +
+                                    '</ul>';
+                    
+                    //'El grafico de barras permite representar: comparacion, distribucion y composicion';
                 break;
             case 'Line':
                 nc_drawChartLine(dataObj);
-                chartInfo.innerHTML = 'El grafico de lineas permite representar: comparacion, distribucion y composicion';
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Comparison</li>' +
+                                    '<li>Distribution</li>' +
+                                    '<li>Composition</li>' +
+                                    '</ul>';
+
+                    //'El grafico de lineas permite representar: comparacion, distribucion y composicion';
                 break;
             case 'Scatter':
                 nc_drawChartScatter(dataObj);
-                chartInfo.innerHTML = 'El grafico de dispersion permite representar: distribucion y relacion';
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +                                    
+                                    '<li>Distribution</li>' +
+                                    '<li>Relationship</li>' +
+                                    '</ul>';
+
+                    //'El grafico de dispersion permite representar: distribucion y relacion';
                 break;
             case 'Bubble':
                 nc_drawChartBubble(dataObj);
-                chartInfo.innerHTML = 'El grafico de burbujas permite representar: relacion';
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +                                    
+                                    '<li>Relationship</li>' +
+                                    '</ul>';
+
+                    //'El grafico de burbujas permite representar: relacion';
                 break;
             case 'Temperature':
                 nc_drawChartTemperature(dataObj);
                 //todo: completar descripcion gráficos pendientes
-                chartInfo.innerHTML = 'El grafico de temperatura permite representar: ';
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>TODO</li>' +
+                                    '</ul>';
+                    //'El grafico de temperatura permite representar: ';
                 break;
             case 'Pie':
                 nc_drawChartPie(dataObj);
-                chartInfo.innerHTML = 'El frafico de tarta permite representar: composicion';
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Composition</li>' +
+                                    '</ul>';
+                    //'El frafico de tarta permite representar: composicion';
                 break;
             case 'Radar':
                 nc_drawChartRadar(dataObj);
-                chartInfo.innerHTML = 'El grafico de radar permite representar: comparacion';
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Comparison</li>' +
+                                    '</ul>';
+                    //'El grafico de radar permite representar: comparacion';
                 break;
             default:
                 break;
@@ -155,7 +192,7 @@
                     '</div>' +
                     '<br/>' +
                     '<h4>Chart description</h4>' +
-                    '<div class="nc_chart_info">Seleccione el grafico que mejor se ajuste al objetivo deseado</div>'
+                    '<div class="nc_chart_info"></div>'
                     //'<fieldset>' +
                     ////'    <legend>Current configuration</legend>' +
                     //'<div> ' +

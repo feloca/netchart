@@ -1,4 +1,5 @@
-﻿using NetChart.Web.ViewModels;
+﻿using NetChart.GeneradorDatos;
+using NetChart.Web.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -8,7 +9,7 @@ using System.Web.Mvc;
 namespace NetChart.Web.Controllers
 {
     public class TestController : Controller
-    {
+    {       
         // GET: Test
         public ActionResult Index()
         {
@@ -61,6 +62,7 @@ namespace NetChart.Web.Controllers
 
         public ActionResult TestBar()
         {
+            var datos = Generator.GenerarPersonas();
             return View();
         }
 

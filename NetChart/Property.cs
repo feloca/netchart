@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -115,6 +116,15 @@ namespace NetChart
 
                 this._isDisplayTypeManual = true;
                 this._displayType = value;
+            }
+        }
+
+        public IComparer PropertyComparer
+        {
+            get
+            {
+                //aqui me he quedado, el tipo devuelto deberia de ser DataComparer
+                throw new NotImplementedException();
             }
         }
 

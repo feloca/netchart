@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -211,6 +212,10 @@ namespace NetChart
             }
             
             this.AddOutputData(output);
+            
+            //Ordenamos la salida            
+            this.SortOutputData(output);
+
             string result = (new JavaScriptSerializer()).Serialize(output);
             //Añado los apostrofes para que cuando alcance el código javascript tener una cadena JSON
             return "'" + result + "'";
@@ -460,7 +465,65 @@ namespace NetChart
                     output.DimensionData[i] = details[i].DimensionDatum;
                 }
             }
+        }
 
+        /// <summary>
+        /// 
+        /// </summary>
+        /// <param name="output"></param>
+        /// <remarks>
+        /// 
+        /// </remarks>
+        private void SortOutputData(Output output)
+        {
+            var a1 =output.VariableData;
+            var a2 = output.DimensionData;
+            var a3 = output.ZVariableData;
+
+            if(output.DimensionData.Length == 0)
+            {
+                return;
+            }
+
+            Type dimensionType = 
+            if(this.DimensionProperty.IsDefined)
+
+            //Si no esta definido el tipo de orden por defecto hace falta segun que tipos aplicar
+            //un tipo por defecto
+            if(this.OrderDimensionProperty == OrderTypeEnum.NotDefined)
+            {
+                switch (this.DimensionProperty.DisplayType)
+                {
+                    case VariableTypeEnum.Discrete:
+                        //ordenar ascendente
+                    case VariableTypeEnum.Continuous:
+                        //ordenar ascendente
+                    case VariableTypeEnum.Nominal:
+                        //nada
+                    case VariableTypeEnum.Ordinal:
+                        //aqui entraria un enumerado (¿y puede que un string???), ordenar por el enumerado
+                        throw new NotImplementedException();
+                    default:
+                        throw new NotSupportedException();
+                }
+            }
+            else
+            {
+                //meter un if para saber si ascendente o descendente, pero el switch es el mismo
+                //if(this.OrderDimensionProperty == OrderTypeEnum.Ascending){}else{}
+                switch (this.DimensionProperty.DisplayType)
+                {
+                    case VariableTypeEnum.Discrete:
+                    case VariableTypeEnum.Continuous:
+                    case VariableTypeEnum.Nominal:
+                    case VariableTypeEnum.Ordinal:
+                        //aqui entraria un enumerado (¿y puede que un string???), ordenar por el enumerado
+                        throw new NotImplementedException();
+                    default:
+                        throw new NotSupportedException();
+                }
+
+            }
         }
 
         /// <summary>

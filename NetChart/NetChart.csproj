@@ -49,6 +49,7 @@
     <Compile Include="OrderTypeEnum.cs" />
     <Compile Include="Output.cs" />
     <Compile Include="OutputDetail.cs" />
+    <Compile Include="DataComparer.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="ChartTypeEnum.cs" />
     <Compile Include="Property.cs" />

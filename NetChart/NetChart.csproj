@@ -46,6 +46,7 @@
     <Compile Include="Chart.cs" />
     <Compile Include="Message.cs" />
     <Compile Include="NetChartException.cs" />
+    <Compile Include="OrderTypeEnum.cs" />
     <Compile Include="Output.cs" />
     <Compile Include="OutputDetail.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />

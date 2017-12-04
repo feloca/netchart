@@ -408,7 +408,7 @@ namespace NetChart
         public static List<T> GetGroupRows<T>(string groupProperty, object groupPropertyValue, IEnumerable<T> data)
         {
             var property = GetProperty(typeof(T), groupProperty);
-            return data.Where(x => property.GetValue(x) == groupPropertyValue).ToList();
+            return data.Where(x => property.GetValue(x).Equals(groupPropertyValue)).ToList();
         }
 
     }

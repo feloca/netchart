@@ -60,7 +60,6 @@ namespace NetChart
         /// </remarks>
         public List<T> Data { get; set; }
 
-
         /// <summary>
         /// Obtiene o establece el nombre de la variable de dimension (variable eje x)
         /// </summary>
@@ -148,7 +147,6 @@ namespace NetChart
             }
         }
 
-
         /// <summary>
         /// 
         /// </summary>
@@ -168,6 +166,15 @@ namespace NetChart
                     this._chartType = value;
                 }
             }
+        }
+
+        /// <summary>
+        /// Obtiene o establece el orden de los datos sobre la propiedad dimension
+        /// </summary>
+        public OrderTypeEnum OrderDimensionProperty
+        {
+            get;
+            set;
         }
 
         /// <summary>
@@ -257,6 +264,7 @@ namespace NetChart
                 throw new NetChartException(Message.ErrorConfigurationPropertyNameNull);
             }
 
+            //Validamos que no esten agregadas a la vez los dos ejes principales
             if (this.VariableProperty.IsDefined && this.DimensionProperty.IsDefined
                 && this.ZVariableProperty.Aggregation != AggregateEnum.NoAggregate
                 && this.DimensionProperty.Aggregation != AggregateEnum.NoAggregate)

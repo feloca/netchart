@@ -84,14 +84,14 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Bar;
+            chart.ChartType = ChartTypeEnum.Line;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
             }
-            chart.VariablePropertyName = "Altura";
-            //chart.VariableProperty.Aggregation;
-            chart.DimensionPropertyName = "Nacionalidad";
+            chart.VariablePropertyName = "Altura";            
+            chart.VariableProperty.Aggregation = AggregateEnum.Average;
+            chart.DimensionPropertyName = "Edad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }

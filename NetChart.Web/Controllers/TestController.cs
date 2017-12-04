@@ -62,45 +62,106 @@ namespace NetChart.Web.Controllers
             return View();
         }
 
-        public ActionResult TestBar()
+        public ActionResult TestBar(int? tipo)
         {
-            var data = Generator.GenerarPersonas();
+            var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Debug;
+            chart.ChartType = ChartTypeEnum.Bar;
+            if(tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
             chart.VariablePropertyName = "Altura";
             //chart.VariableProperty.Aggregation;
             chart.DimensionPropertyName = "Nacionalidad";
-            //chart.DimensionProperty.Aggregation;
-            //chart.ZVariablePropertyName;
-            //chart.ZVariableProperty.Aggregation;
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
 
-        public ActionResult TestLine()
+        public ActionResult TestLine(int? tipo)
         {
-            return View();
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Bar;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+            chart.VariablePropertyName = "Altura";
+            //chart.VariableProperty.Aggregation;
+            chart.DimensionPropertyName = "Nacionalidad";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
         }
 
-        public ActionResult TestScatter()
+        public ActionResult TestScatter(int? tipo)
         {
-            return View();
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Bar;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+            chart.VariablePropertyName = "Altura";
+            //chart.VariableProperty.Aggregation;
+            chart.DimensionPropertyName = "Nacionalidad";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
         }
 
-        public ActionResult TestBubble()
+        public ActionResult TestBubble(int? tipo)
         {
-            return View();
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Bar;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+            chart.VariablePropertyName = "Altura";
+            //chart.VariableProperty.Aggregation;
+            chart.DimensionPropertyName = "Nacionalidad";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);           
         }
 
-        public ActionResult TestPie()
+        public ActionResult TestPie(int? tipo)
         {
-            return View();
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Bar;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+            chart.VariablePropertyName = "Altura";
+            //chart.VariableProperty.Aggregation;
+            chart.DimensionPropertyName = "Nacionalidad";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
         }
 
-        public ActionResult TestRadar()
+        public ActionResult TestRadar(int? tipo)
         {
-            return View();
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Bar;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+            chart.VariablePropertyName = "Altura";
+            //chart.VariableProperty.Aggregation;
+            chart.DimensionPropertyName = "Nacionalidad";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
         }
     }
 }

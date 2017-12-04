@@ -1,12 +1,12 @@
 ﻿@model IEnumerable<NetChart.GeneradorDatos.Persona>
 
 @{
-    ViewBag.Title = "Test Bar";
+    ViewBag.Title = "Test Line";
 }
 
-<h2>Test Bar</h2>
+<h2>Test Line</h2>
 
-@Html.ActionLink("Modo Depuracion", "TestBar", new { tipo = 0 }) | @Html.ActionLink("Modo Presentacion", "TestBar")
+@Html.ActionLink("Modo Depuracion", "TestLine", new { tipo = 0 }) | @Html.ActionLink("Modo Presentacion", "TestLine")
 <div style="width:1000px;height:500px;">
     <div id="grafico" style="border:solid;width:100%;height:100%;float:left;">
         <h1>Caja para el grafico</h1>
@@ -54,34 +54,33 @@
         </th>
     </tr>
 
-    @foreach (var item in Model)
-    {
-        <tr>
-            <td>
-                @Html.DisplayFor(modelItem => item.Edad)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Altura)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Peso)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Tension)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Nacionalidad)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ocupacion)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Estudios)
-            </td>
-            <td>
-                @Html.DisplayFor(modelItem => item.Ingresos)
-            </td>
-        </tr>
-    }
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Edad)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Altura)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Peso)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Tension)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Nacionalidad)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Ocupacion)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Estudios)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Ingresos)
+        </td>
+    </tr>
+}
 
 </table>

@@ -214,6 +214,11 @@
     <Content Include="Views\Test\Index.cshtml" />
     <Content Include="Views\Test\Desa.cshtml" />
     <Content Include="Views\Test\TestBar.cshtml" />
+    <Content Include="Views\Test\TestLine.cshtml" />
+    <Content Include="Views\Test\TestScatter.cshtml" />
+    <Content Include="Views\Test\TestBubble.cshtml" />
+    <Content Include="Views\Test\TestPie.cshtml" />
+    <Content Include="Views\Test\TestRadar.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

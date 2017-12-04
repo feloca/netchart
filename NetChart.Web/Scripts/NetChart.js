@@ -50,6 +50,9 @@
 
     //funcion que dibuja el grafico JS, reciba el JSON con los datos
     nc.draw = function (dataStr) {
+        //como decodificar caracteres de escape de html
+        //https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it
+
         console.log('fn draw');
         var dataObj = JSON.parse(dataStr);
         //data_obj.ChartType;
@@ -84,6 +87,7 @@
                 nc_drawChartRadar(dataObj);
                 break;
             default:
+                console.log('fn draw: no se ha encontrado el tipo ' + dataObj.ChartType);
                 break;
         }
     }
@@ -187,29 +191,12 @@
                     '<br/>' +
                     '<div>' +
                     '<label>Suggestions: </label>' +
-                    '<select onchange=\'nc.debugSelection(this, ' + JSON.stringify(data)+ ');\'>' + options +       
+                    '<select onchange=\'nc.debugSelection(this, ' + JSON.stringify(data) + ');\'>' + options +
 			        '</select>' +
                     '</div>' +
                     '<br/>' +
                     '<h4>Chart description</h4>' +
-                    '<div class="nc_chart_info"></div>'
-                    //'<fieldset>' +
-                    ////'    <legend>Current configuration</legend>' +
-                    //'<div> ' +
-                    //'        <label>Variable: </label>' +
-                    //'        Nominal - SUM                ' +
-                    //'</br>ESTO ESTA HARDCODEADO ' +
-                    //'</div>' +
-                    //'<div>' +
-                    //'    <label>Dimension: </label>' +
-                    //'    Discrete                ' +
-                    //'</div>' +
-                    //'<div>' +
-                    //'    <label>ZVariable: </label>' +
-                    //'    No defined  ' +
-                    //'</div>' +
-                    //'</fieldset>';
-
+                    '<div class="nc_chart_info"></div>';              
 
         //padding:.5em; NO FUNCIONA, los estilos en svg se asignan distinto de los ELEMENT, lo pongo como atributo
         //nc_appendStyleAttribute(divControl, "padding", "2em;"); 

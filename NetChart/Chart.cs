@@ -193,7 +193,7 @@ namespace NetChart
                 throw new NetChartException(Message.ErrorConfigurationNoData);
             }
             var output = new Output();
-            output.ChartType = this.ChartType.ToString();
+            output.ChartType = ((int)this.ChartType).ToString() ;
 
             if (this.ChartType == ChartTypeEnum.Debug)
             {                
@@ -205,7 +205,8 @@ namespace NetChart
             
             this.AddOutputData(output);
             string result = (new JavaScriptSerializer()).Serialize(output);
-            return result;
+            //Añado los apostrofes para que cuando alcance el código javascript tener una cadena JSON
+            return "'" + result + "'";
         }
 
         /// <summary>
@@ -458,9 +459,10 @@ namespace NetChart
         /// Obtine las sugerencias recomendadas para los datos especificados
         /// </summary>
         /// <returns></returns>
-        private string[] GetSuggestions()
+        private int[] GetSuggestions()
         {
-            var results = new List<string>();
+            var results = new List<int>();
+            results.Add((int)ChartTypeEnum.Debug);
             //OJO, las variables cuantitaticas discretas pueden tratarse como continuas,
             //contemplar la posibilidad de poner un comentario al usuario
 
@@ -479,12 +481,12 @@ namespace NetChart
                 switch (this.ZVariableProperty.DisplayType)
                 {
                     case VariableTypeEnum.Continuous:
-                        results.Add(ChartTypeEnum.Bubble.ToString());
-                        results.Add(ChartTypeEnum.Temperature.ToString());
+                        results.Add((int)ChartTypeEnum.Bubble);
+                        results.Add((int)ChartTypeEnum.Temperature);
                         break;
                     case VariableTypeEnum.Discrete:
-                        results.Add(ChartTypeEnum.Bubble.ToString());
-                        results.Add(ChartTypeEnum.Temperature.ToString());
+                        results.Add((int)ChartTypeEnum.Bubble);
+                        results.Add((int)ChartTypeEnum.Temperature);
                         break;
                     case VariableTypeEnum.Nominal:
                         //TODO: No se que poner aqui, creo deberiamos de poner una etiqueta, ¿usar una gráfico de burbujas?
@@ -503,17 +505,17 @@ namespace NetChart
                         switch (this.DimensionProperty.DisplayType)
                         {
                             case VariableTypeEnum.Continuous:
-                                results.Add(ChartTypeEnum.Line.ToString());
+                                results.Add((int)ChartTypeEnum.Line);
                                 break;
                             case VariableTypeEnum.Discrete:
-                                results.Add(ChartTypeEnum.Bar.ToString());
-                                results.Add(ChartTypeEnum.Pie.ToString());
-                                results.Add(ChartTypeEnum.Radar.ToString());
+                                results.Add((int)ChartTypeEnum.Bar);
+                                results.Add((int)ChartTypeEnum.Pie);
+                                results.Add((int)ChartTypeEnum.Radar);
                                 break;
                             case VariableTypeEnum.Nominal:
-                                results.Add(ChartTypeEnum.Bar.ToString());
-                                results.Add(ChartTypeEnum.Pie.ToString());
-                                results.Add(ChartTypeEnum.Radar.ToString());
+                                results.Add((int)ChartTypeEnum.Bar);
+                                results.Add((int)ChartTypeEnum.Pie);
+                                results.Add((int)ChartTypeEnum.Radar);
                                 break;
                             default:
                                 throw new NotSupportedException();
@@ -523,16 +525,16 @@ namespace NetChart
                         switch (this.DimensionProperty.DisplayType)
                         {
                             case VariableTypeEnum.Continuous:
-                                results.Add(ChartTypeEnum.Line.ToString());
-                                results.Add(ChartTypeEnum.Scatter.ToString()); //este no lo tengo claro
+                                results.Add((int)ChartTypeEnum.Line);
+                                results.Add((int)ChartTypeEnum.Scatter); //este no lo tengo claro
                                 break;
                             case VariableTypeEnum.Discrete:
-                                results.Add(ChartTypeEnum.Scatter.ToString());
+                                results.Add((int)ChartTypeEnum.Scatter);
                                 break;
                             case VariableTypeEnum.Nominal:
-                                results.Add(ChartTypeEnum.Bar.ToString());
-                                results.Add(ChartTypeEnum.Pie.ToString());
-                                results.Add(ChartTypeEnum.Radar.ToString());
+                                results.Add((int)ChartTypeEnum.Bar);
+                                results.Add((int)ChartTypeEnum.Pie);
+                                results.Add((int)ChartTypeEnum.Radar);
                                 break;
                             default:
                                 throw new NotSupportedException();
@@ -544,7 +546,7 @@ namespace NetChart
                             case VariableTypeEnum.Continuous:
                             case VariableTypeEnum.Discrete:
                             case VariableTypeEnum.Nominal:
-                                results.Add(ChartTypeEnum.Bubble.ToString());
+                                results.Add((int)ChartTypeEnum.Bubble);
                                 break;
                             default:
                                 throw new NotSupportedException();

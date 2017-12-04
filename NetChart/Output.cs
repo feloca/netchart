@@ -16,7 +16,7 @@ namespace NetChart
         /// <summary>
         /// Obtiene o establece las opciones gráficas recomendadas para los datos especificados, unicamente disponible para ChartType.Debug
         /// </summary>
-        public string[] Suggestions { get; set; }
+        public int[] Suggestions { get; set; }
 
         /// <summary>
         /// Obtiene o establece información de depuración de la propiedad "variable", unicamente disponible para ChartType.Debug

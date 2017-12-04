@@ -7,19 +7,19 @@ namespace NetChart.GeneradorDatos
 {
     public class Generator
     {
-        public const int NumeroDatos = 50;
+        //public const int NumeroDatos = 50;
         public const int Semilla = 1234;
 
         private static Random rnd = new Random(Semilla);
 
 
-        public static string GenerarDatosPersonas()
+        public static string GenerarDatosPersonas(int numero = 50)
         {
             string mascara = "new Persona(){0}Edad={2}, Altura={3}, Coeficiente={4}{1}, ";
             var rnd = new Random();
             var sbPersonas = new StringBuilder();
 
-            for (int i = 0; i < NumeroDatos; ++i)
+            for (int i = 0; i < numero; ++i)
             {
                 sbPersonas.AppendLine(string.Format(mascara, "{", "}", rnd.Next(15, 65), rnd.Next(140, 210), rnd.Next(70, 150)));
             }
@@ -31,7 +31,7 @@ namespace NetChart.GeneradorDatos
         }
 
 
-        public static List<Persona> GenerarPersonas()
+        public static List<Persona> GenerarPersonas(int numero = 50)
         {
             var resultados = new List<Persona>();
 
@@ -40,7 +40,7 @@ namespace NetChart.GeneradorDatos
             var estudios = new string[] { "primaria", "secundaria", "fp", "diplomado", "doctor" };
             var ingresos = new string[] { "bajos", "medios", "altos", "muy_altos" };
 
-            for (int i = 0; i < NumeroDatos; ++i)
+            for (int i = 0; i < numero; ++i)
             {
                 var persona = new Persona()
                 {

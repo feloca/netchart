@@ -201,18 +201,18 @@ namespace NetChart
                 throw new NetChartException(Message.ErrorConfigurationNoData);
             }
             var output = new Output();
-            output.ChartType = ((int)this.ChartType).ToString() ;
+            output.ChartType = ((int)this.ChartType).ToString();
 
             if (this.ChartType == ChartTypeEnum.Debug)
-            {                
+            {
                 output.Suggestions = this.GetSuggestions();
                 output.VariableInfo = this.GetPropertyDebugInfo(this.VariableProperty);
                 output.DimensionInfo = this.GetPropertyDebugInfo(this.DimensionProperty);
                 output.ZVariableInfo = this.GetPropertyDebugInfo(this.ZVariableProperty);
             }
-            
+
             this.AddOutputData(output);
-            
+
             //Ordenamos la salida            
             this.SortOutputData(output);
 
@@ -232,7 +232,7 @@ namespace NetChart
             if (property.IsDefined)
             {
                 result = property.Name;
-                if(property.Aggregation != AggregateEnum.NoAggregate)
+                if (property.Aggregation != AggregateEnum.NoAggregate)
                 {
                     result += " (" + property.Aggregation.ToString() + ")";
                 }
@@ -306,7 +306,7 @@ namespace NetChart
             }
 
             //validamos la z si esta definida
-            if (this.ZVariableProperty.IsDefined 
+            if (this.ZVariableProperty.IsDefined
                 && this.ZVariableProperty.DisplayType != VariableTypeEnum.Discrete
                 && this.ZVariableProperty.DisplayType != VariableTypeEnum.Continuous)
             {
@@ -341,7 +341,7 @@ namespace NetChart
             if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
             {
                 //if (!string.IsNullOrEmpty(this.DimensionPropertyName))
-                if(this.DimensionProperty.IsDefined)
+                if (this.DimensionProperty.IsDefined)
                 {
                     //no es nula la dimension, para cada valor de dimension hacer un grupo, en dimension poner la llave del 
                     //grupo, y en variable el valor del agregado. Poner todos los elementos del grupo en la propiedad outputdetail.DATA
@@ -378,7 +378,7 @@ namespace NetChart
                 //caso de no agregacion
 
                 //if (!string.IsNullOrEmpty(this.DimensionPropertyName))
-                if(this.DimensionProperty.IsDefined)
+                if (this.DimensionProperty.IsDefined)
                 {
                     //no es nula la dimension, hace falta sacar los valores de dimension y de variable, 
                     //Poner todos los elementos del grupo en la propiedad outputdetail.DATA
@@ -468,7 +468,8 @@ namespace NetChart
         }
 
         /// <summary>
-        /// 
+        /// Ordena la información de salida según la configuracion indicada por el usuario o según
+        /// criterios por defecto
         /// </summary>
         /// <param name="output"></param>
         /// <remarks>
@@ -476,33 +477,35 @@ namespace NetChart
         /// </remarks>
         private void SortOutputData(Output output)
         {
-            var a1 =output.VariableData;
-            var a2 = output.DimensionData;
-            var a3 = output.ZVariableData;
-
-            if(output.DimensionData.Length == 0)
+            if (output.DimensionData.Length == 0)
             {
                 return;
             }
 
-            Type dimensionType = 
-            if(this.DimensionProperty.IsDefined)
+            var comparer = this.DimensionProperty.Comparer;
 
             //Si no esta definido el tipo de orden por defecto hace falta segun que tipos aplicar
             //un tipo por defecto
-            if(this.OrderDimensionProperty == OrderTypeEnum.NotDefined)
+            if (this.OrderDimensionProperty == OrderTypeEnum.NotDefined)
             {
                 switch (this.DimensionProperty.DisplayType)
                 {
                     case VariableTypeEnum.Discrete:
                         //ordenar ascendente
+                        SortOutputData(output, comparer);
+                        return;
                     case VariableTypeEnum.Continuous:
                         //ordenar ascendente
+                        SortOutputData(output, comparer);
+                        return;
                     case VariableTypeEnum.Nominal:
                         //nada
+                        return;
                     case VariableTypeEnum.Ordinal:
                         //aqui entraria un enumerado (¿y puede que un string???), ordenar por el enumerado
-                        throw new NotImplementedException();
+                        //Este no tiene ordenacion por defecto, es parecido al nominal
+                        //SortOutputData(output, comparer);
+                        return;
                     default:
                         throw new NotSupportedException();
                 }
@@ -510,20 +513,77 @@ namespace NetChart
             else
             {
                 //meter un if para saber si ascendente o descendente, pero el switch es el mismo
-                //if(this.OrderDimensionProperty == OrderTypeEnum.Ascending){}else{}
+                if (this.OrderDimensionProperty == OrderTypeEnum.Descending)
+                {
+                    comparer.Descending = true;
+                }
+
                 switch (this.DimensionProperty.DisplayType)
                 {
                     case VariableTypeEnum.Discrete:
+                        SortOutputData(output, comparer);
+                        return;
                     case VariableTypeEnum.Continuous:
+                        SortOutputData(output, comparer);
+                        return;
                     case VariableTypeEnum.Nominal:
+                        SortOutputData(output, comparer);
+                        return;
                     case VariableTypeEnum.Ordinal:
                         //aqui entraria un enumerado (¿y puede que un string???), ordenar por el enumerado
-                        throw new NotImplementedException();
+                        SortOutputData(output, comparer);
+                        return;
                     default:
                         throw new NotSupportedException();
                 }
 
             }
+        }
+
+        /// <summary>
+        /// Esta funcion se encarga de ordenar los datos de salida segun la configuracion indicada a traves del 
+        /// objeto comparador
+        /// </summary>
+        /// <param name="output"></param>
+        /// <param name="comparer"></param>
+        private void SortOutputData(Output output, DataComparer comparer)
+        {
+            //var a1 =output.VariableData;
+            //var a2 = output.DimensionData;
+            //var a3 = output.ZVariableData;
+            object auxVariable = null;
+            object auxDimension = null;
+            object auxZVariable = null;
+
+            //la z puede o no aparecer
+            bool checkZ = (output.ZVariableData != null && (output.DimensionData.Length == output.ZVariableData.Length));
+            bool ordered = true;
+
+            do
+            {
+                ordered = true;
+                for (int i = 0; i < output.DimensionData.Length - 1; ++i)
+                {
+                    if (comparer.Compare(output.DimensionData[i], output.DimensionData[i + 1]) > 0)
+                    {
+                        ordered = false;
+                        auxVariable = output.VariableData[i];
+                        output.VariableData[i] = output.VariableData[i + 1];
+                        output.VariableData[i + 1] = auxVariable;
+
+                        auxDimension = output.DimensionData[i];
+                        output.DimensionData[i] = output.DimensionData[i + 1];
+                        output.DimensionData[i + 1] = auxDimension;
+
+                        if (checkZ)
+                        {
+                            auxZVariable = output.ZVariableData[i];
+                            output.ZVariableData[i] = output.ZVariableData[i + 1];
+                            output.ZVariableData[i + 1] = output.ZVariableData[i];
+                        }
+                    }
+                }
+            } while (ordered == false);
         }
 
         /// <summary>
@@ -626,7 +686,7 @@ namespace NetChart
                     default:
                         throw new NotSupportedException();
                 }
-                
+
                 //TODO: consultar esto con monitor o yussef
                 //results.Add(ChartTypeEnum.Bar.ToString());
                 //results.Add(ChartTypeEnum.Line.ToString());

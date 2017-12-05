@@ -88,11 +88,11 @@ namespace NetChart
                     //da igua que este agregada, porque el tipo resultado de la agregacion es el mismo que el de la propiedad sin agregar
                     //salvo en el caso de contar que tendre siempre un valor entero
                     //con tipos cadena no se puede sumar ni hacer la media, validado en el set
-                    if(this.Aggregation == AggregateEnum.Count)
+                    if (this.Aggregation == AggregateEnum.Count)
                     {
                         return VariableTypeEnum.Discrete;
                     }
-                                        
+
                     return DataHelper.GetPropertyDisplayType(WorkType, this.Name);
                 }
 
@@ -104,10 +104,10 @@ namespace NetChart
                 //basicamente si el tipo es un numero y lo tratamos como cadena puede dar 
                 //error al agregar
                 var realType = DataHelper.GetPropertyDisplayType(WorkType, this.Name);
-                if(realType != VariableTypeEnum.Discrete
+                if (realType != VariableTypeEnum.Discrete
                     && realType != VariableTypeEnum.Continuous)
                 {
-                    if(value == VariableTypeEnum.Continuous ||
+                    if (value == VariableTypeEnum.Continuous ||
                         value == VariableTypeEnum.Discrete)
                     {
                         throw new NetChartException(Message.ErrorConfigurationInvalidDisplayType);
@@ -119,12 +119,23 @@ namespace NetChart
             }
         }
 
-        public IComparer PropertyComparer
+        /// <summary>
+        /// Obtiene un objeto comparador configurado segun las caracteristicas de la propiedad
+        /// </summary>
+        public DataComparer Comparer
         {
             get
             {
-                //aqui me he quedado, el tipo devuelto deberia de ser DataComparer
-                throw new NotImplementedException();
+                var comparer = new DataComparer();
+                if (this.IsDefined)
+                {
+                    comparer.PropertyType = DataHelper.GetProperty(this.WorkType, this.Name).PropertyType;
+                }
+                else
+                {
+                    comparer.PropertyType =  default(int).GetType();
+                }                
+                return comparer;                
             }
         }
 

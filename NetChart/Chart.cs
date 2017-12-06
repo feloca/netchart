@@ -606,6 +606,8 @@ namespace NetChart
             //TODO: Hacer un arbol con las propiedades y meterlo en el documento del TFM
             VariableTypeEnum dimensionDisplayType = this.DimensionProperty.DisplayType;
 
+            //
+
             if (this.ZVariableProperty.IsDefined)
             {
                 //creo que en este caso no importa si la z es agregada o no, aquí va un valor discreto de z
@@ -624,6 +626,8 @@ namespace NetChart
                         //results.Add(ChartTypeEnum.Bubble.ToString());
                         throw new NotImplementedException();
                         break;
+                    case VariableTypeEnum.Ordinal:                        
+                        throw new NotImplementedException();
                     default:
                         throw new NotSupportedException();
                 }
@@ -648,6 +652,8 @@ namespace NetChart
                                 results.Add((int)ChartTypeEnum.Pie);
                                 results.Add((int)ChartTypeEnum.Radar);
                                 break;
+                            case VariableTypeEnum.Ordinal:
+                                throw new NotImplementedException();
                             default:
                                 throw new NotSupportedException();
                         }
@@ -667,6 +673,8 @@ namespace NetChart
                                 results.Add((int)ChartTypeEnum.Pie);
                                 results.Add((int)ChartTypeEnum.Radar);
                                 break;
+                            case VariableTypeEnum.Ordinal:
+                                throw new NotImplementedException();
                             default:
                                 throw new NotSupportedException();
                         }
@@ -679,6 +687,8 @@ namespace NetChart
                             case VariableTypeEnum.Nominal:
                                 results.Add((int)ChartTypeEnum.Bubble);
                                 break;
+                            case VariableTypeEnum.Ordinal:
+                                throw new NotImplementedException();
                             default:
                                 throw new NotSupportedException();
                         }

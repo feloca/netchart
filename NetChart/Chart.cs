@@ -16,6 +16,7 @@ namespace NetChart
             this._dataProperty = new Property<T>();
             this._dimensionProperty = new Property<T>();
             this._zDataProperty = new Property<T>();
+            this._serieProperty = new Property<T>();
         }
 
         public Chart(string configuration) : this()
@@ -39,6 +40,7 @@ namespace NetChart
         private Property<T> _dataProperty;
         private Property<T> _dimensionProperty;
         private Property<T> _zDataProperty;
+        private Property<T> _serieProperty;
 
         private Type WorkType
         {
@@ -116,6 +118,21 @@ namespace NetChart
         }
 
         /// <summary>
+        /// Obtiene o establece el nombre de la propiedad que define las series
+        /// </summary>
+        public string SeriePropertyName
+        {
+            get
+            {
+                return this.SerieProperty.Name;
+            }
+            set
+            {
+                this.SerieProperty.Name = value;
+            }
+        }
+
+        /// <summary>
         /// Obtiene la configuracion de la variable principal (variable eje y)
         /// </summary>
         public Property<T> VariableProperty
@@ -145,6 +162,20 @@ namespace NetChart
             get
             {
                 return this._zDataProperty;
+            }
+        }
+
+        /// <summary>
+        /// Obtiene la configuracion de la serie
+        /// </summary>
+        /// <remarks>
+        /// Es privada porque para el usuario solamente es necesario definir la serie
+        /// </remarks>
+        private Property<T> SerieProperty
+        {
+            get
+            {
+                return this._serieProperty;
             }
         }
 
@@ -211,6 +242,7 @@ namespace NetChart
                 output.ZVariableInfo = this.GetPropertyDebugInfo(this.ZVariableProperty);
             }
 
+            //Formateamos y cargamos los datos en la salida
             this.AddOutputData(output);
 
             //Ordenamos la salida            
@@ -333,22 +365,74 @@ namespace NetChart
         /// </remarks>
         private void AddOutputData(Output output)
         {
-            //var variableData = new List<OutputDetail<T>>();
+            //aqui me he quedado, mirar lo de las series
+            //y para cada serie llamar a una funcion que procese los datos como esto que esta aqui
+
+            //aunque no exista serie definida devolveremos los datos en una serie
+            //si serie definida agrupar datos por series sino todos los datos son la serie
+            //para cada serie generar un output de serie
+
+            //OutputSerie
+            var results = new List<OutputSeries>();
+            if (this.SerieProperty.IsDefined)
+            {
+                var seriesValues = DataHelper.GetPropertyValues<T>(this.SeriePropertyName, this.Data);
+                var listSeries = new List<OutputSeries>();
+
+                for (int i = 0; i < seriesValues.Count; ++i)
+                {
+                    var seriesData = DataHelper.GetGroupRows<T>(this.DimensionPropertyName, seriesValues[i], this.Data);
+                    var outputSeries = new OutputSeries();
+                    outputSeries.Descriptor = seriesValues[i];
+                    ProcessOutputSeries(outputSeries, seriesData);
+                    results.Add(outputSeries);
+                }
+            }
+            else
+            {
+                var outputSeries = new OutputSeries();
+                outputSeries.Descriptor = "BASE";
+                ProcessOutputSeries(outputSeries, this.Data);
+                results.Add(outputSeries);
+            }
+
+            output.Series = results.ToArray();
+
+            if (this.SerieProperty.IsDefined)
+            {
+                List<object> dimensions = new List<object>();
+                
+                for(int i = 0; i < output.Series.Length; ++i)
+                {
+                    dimensions.AddRange(output.Series[i].DimensionData);
+                }
+
+                var dataComparer =((IEqualityComparer<object>)this.DimensionProperty.Comparer);                
+                output.SeriesDimensions = dimensions.Distinct(dataComparer).ToArray();
+            }
+        }
+
+        /// <summary>
+        /// Procesa los datos de una serie dandolos formato adaptado a la salida grafica
+        /// </summary>
+        /// <param name="outputSeries"></param>
+        /// <param name="seriesData"></param>
+        private void ProcessOutputSeries(OutputSeries outputSeries, List<T> seriesData)
+        {
             var details = new List<OutputDetail<T>>();
             var zDetails = new List<OutputDetail<T>>();
 
             //TODO: este if se puede refactorizar, los dos else internos son iguales
             if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
             {
-                //if (!string.IsNullOrEmpty(this.DimensionPropertyName))
                 if (this.DimensionProperty.IsDefined)
                 {
                     //no es nula la dimension, para cada valor de dimension hacer un grupo, en dimension poner la llave del 
                     //grupo, y en variable el valor del agregado. Poner todos los elementos del grupo en la propiedad outputdetail.DATA
-                    var dimensionValues = DataHelper.GetPropertyValues<T>(this.DimensionPropertyName, this.Data);
+                    var dimensionValues = DataHelper.GetPropertyValues<T>(this.DimensionPropertyName, seriesData);
                     for (int i = 0; i < dimensionValues.Count; ++i)
                     {
-                        var groupRows = DataHelper.GetGroupRows<T>(this.DimensionPropertyName, dimensionValues[i], this.Data);
+                        var groupRows = DataHelper.GetGroupRows<T>(this.DimensionPropertyName, dimensionValues[i], seriesData);
                         var agregateValue = DataHelper.CalculateAggregate<T>(this.VariableProperty.Name, this.VariableProperty.Aggregation, groupRows);
                         details.Add(new OutputDetail<T>()
                         {
@@ -362,13 +446,13 @@ namespace NetChart
                 {
                     //es nula la dimension, en dimension 0, 1, 2, 3, etc.. en variable el valor de variable, y poner fila en data
                     var propertyInfo = DataHelper.GetProperty(this.WorkType, this.VariableProperty.Name);
-                    for (int i = 0; i < this.Data.Count; ++i)
+                    for (int i = 0; i < seriesData.Count; ++i)
                     {
                         details.Add(new OutputDetail<T>()
                         {
-                            VariableDatum = propertyInfo.GetValue(this.Data[i]),
+                            VariableDatum = propertyInfo.GetValue(seriesData[i]),
                             DimensionDatum = i,
-                            Data = new List<T>() { this.Data[i] }
+                            Data = new List<T>() { seriesData[i] }
                         });
                     }
                 }
@@ -376,37 +460,34 @@ namespace NetChart
             else
             {
                 //caso de no agregacion
-
-                //if (!string.IsNullOrEmpty(this.DimensionPropertyName))
                 if (this.DimensionProperty.IsDefined)
                 {
                     //no es nula la dimension, hace falta sacar los valores de dimension y de variable, 
                     //Poner todos los elementos del grupo en la propiedad outputdetail.DATA
                     var propertyInfo = DataHelper.GetProperty(this.WorkType, this.VariableProperty.Name);
                     var dimensionPropertyInfo = DataHelper.GetProperty(this.WorkType, this.DimensionPropertyName);
-                    for (int i = 0; i < this.Data.Count; ++i)
+                    for (int i = 0; i < seriesData.Count; ++i)
                     {
                         details.Add(new OutputDetail<T>()
                         {
-                            VariableDatum = propertyInfo.GetValue(this.Data[i]),
-                            DimensionDatum = dimensionPropertyInfo.GetValue(this.Data[i]),
-                            Data = new List<T>() { this.Data[i] }
+                            VariableDatum = propertyInfo.GetValue(seriesData[i]),
+                            DimensionDatum = dimensionPropertyInfo.GetValue(seriesData[i]),
+                            Data = new List<T>() { seriesData[i] }
                         });
                     }
-
                 }
                 else
                 {
                     //es nula la dimension, luego la dimension es 0, 1, 2, 3, etc.. usar el orden de los datos
                     //Poner la fila en DATA
                     var propertyInfo = DataHelper.GetProperty(this.WorkType, this.VariableProperty.Name);
-                    for (int i = 0; i < this.Data.Count; ++i)
+                    for (int i = 0; i < seriesData.Count; ++i)
                     {
                         details.Add(new OutputDetail<T>()
                         {
-                            VariableDatum = propertyInfo.GetValue(this.Data[i]),
+                            VariableDatum = propertyInfo.GetValue(seriesData[i]),
                             DimensionDatum = i,
-                            Data = new List<T>() { this.Data[i] }
+                            Data = new List<T>() { seriesData[i] }
                         });
                     }
                 }
@@ -422,47 +503,45 @@ namespace NetChart
                 {
                     //caso de agregacion en z
                     //poner en z el valor de la agregacion de la coleccion de datos
-                    output.VariableData = new object[details.Count];
-                    output.DimensionData = new object[details.Count];
-                    output.ZVariableData = new object[details.Count];
+                    outputSeries.VariableData = new object[details.Count];
+                    outputSeries.DimensionData = new object[details.Count];
+                    outputSeries.ZVariableData = new object[details.Count];
 
                     for (int i = 0; i < details.Count; ++i)
                     {
-                        output.VariableData[i] = details[i].VariableDatum;
-                        output.DimensionData[i] = details[i].DimensionDatum;
-                        output.ZVariableData[i] = DataHelper.CalculateAggregate<T>(this.ZVariableProperty.Name, this.ZVariableProperty.Aggregation, details[i].Data);
+                        outputSeries.VariableData[i] = details[i].VariableDatum;
+                        outputSeries.DimensionData[i] = details[i].DimensionDatum;
+                        outputSeries.ZVariableData[i] = DataHelper.CalculateAggregate<T>(this.ZVariableProperty.Name, this.ZVariableProperty.Aggregation, details[i].Data);
                     }
-
                 }
                 else
                 {
                     //caso de no agregacion en z
                     //poner el valor de z del primer elemento de la coleccion de datos
-                    var zPropertyInfo = DataHelper.GetProperty(this.WorkType, this.VariableProperty.Name);
+                    var zPropertyInfo = DataHelper.GetProperty(this.WorkType, this.ZVariableProperty.Name);
 
-                    output.VariableData = new object[details.Count];
-                    output.DimensionData = new object[details.Count];
-                    output.ZVariableData = new object[details.Count];
+                    outputSeries.VariableData = new object[details.Count];
+                    outputSeries.DimensionData = new object[details.Count];
+                    outputSeries.ZVariableData = new object[details.Count];
 
                     for (int i = 0; i < details.Count; ++i)
                     {
-                        output.VariableData[i] = details[i].VariableDatum;
-                        output.DimensionData[i] = details[i].DimensionDatum;
-                        output.ZVariableData[i] = zPropertyInfo.GetValue(details[i].Data.First());
+                        outputSeries.VariableData[i] = details[i].VariableDatum;
+                        outputSeries.DimensionData[i] = details[i].DimensionDatum;
+                        outputSeries.ZVariableData[i] = zPropertyInfo.GetValue(details[i].Data.First());
                     }
-
                 }
             }
             else
             {
                 //caso, no hay z         
-                output.VariableData = new object[details.Count];
-                output.DimensionData = new object[details.Count];
-                output.ZVariableData = null;
+                outputSeries.VariableData = new object[details.Count];
+                outputSeries.DimensionData = new object[details.Count];
+                outputSeries.ZVariableData = null;
                 for (int i = 0; i < details.Count; ++i)
                 {
-                    output.VariableData[i] = details[i].VariableDatum;
-                    output.DimensionData[i] = details[i].DimensionDatum;
+                    outputSeries.VariableData[i] = details[i].VariableDatum;
+                    outputSeries.DimensionData[i] = details[i].DimensionDatum;
                 }
             }
         }
@@ -477,12 +556,27 @@ namespace NetChart
         /// </remarks>
         private void SortOutputData(Output output)
         {
-            if (output.DimensionData.Length == 0)
+            var comparer = this.ConfigureComparer();
+            if(comparer == null)
             {
                 return;
             }
 
-            var comparer = this.DimensionProperty.Comparer;
+            for (int i = 0; i < output.Series.Length; ++i)
+            {
+                SortOutputData(output.Series[i], comparer);
+            }
+
+            //Ordeno las dimensiones en el caso de existir series
+            if (SerieProperty.IsDefined)
+            {
+                Array.Sort(output.SeriesDimensions, comparer);                
+            }
+        }
+
+        private DataComparer ConfigureComparer()
+        {
+            DataComparer comparer = this.DimensionProperty.Comparer;
 
             //Si no esta definido el tipo de orden por defecto hace falta segun que tipos aplicar
             //un tipo por defecto
@@ -492,27 +586,23 @@ namespace NetChart
                 {
                     case VariableTypeEnum.Discrete:
                         //ordenar ascendente
-                        SortOutputData(output, comparer);
-                        return;
+                        return comparer;
                     case VariableTypeEnum.Continuous:
                         //ordenar ascendente
-                        SortOutputData(output, comparer);
-                        return;
+                        return comparer;
                     case VariableTypeEnum.Nominal:
                         //nada
-                        return;
+                        return null;
                     case VariableTypeEnum.Ordinal:
-                        //aqui entraria un enumerado (¿y puede que un string???), ordenar por el enumerado
+                        //todo: aqui entraria un enumerado (¿y puede que un string???), ordenar por el enumerado
                         //Este no tiene ordenacion por defecto, es parecido al nominal
-                        //SortOutputData(output, comparer);
-                        return;
+                        return comparer;
                     default:
                         throw new NotSupportedException();
                 }
             }
             else
             {
-                //meter un if para saber si ascendente o descendente, pero el switch es el mismo
                 if (this.OrderDimensionProperty == OrderTypeEnum.Descending)
                 {
                     comparer.Descending = true;
@@ -521,23 +611,18 @@ namespace NetChart
                 switch (this.DimensionProperty.DisplayType)
                 {
                     case VariableTypeEnum.Discrete:
-                        SortOutputData(output, comparer);
-                        return;
+                        return comparer;
                     case VariableTypeEnum.Continuous:
-                        SortOutputData(output, comparer);
-                        return;
+                        return comparer;
                     case VariableTypeEnum.Nominal:
-                        SortOutputData(output, comparer);
-                        return;
+                        return comparer;
                     case VariableTypeEnum.Ordinal:
-                        //aqui entraria un enumerado (¿y puede que un string???), ordenar por el enumerado
-                        SortOutputData(output, comparer);
-                        return;
+                        //todo: aqui entraria un enumerado (¿y puede que un string???), ordenar por el enumerado
+                        return comparer;
                     default:
                         throw new NotSupportedException();
                 }
-
-            }
+            }            
         }
 
         /// <summary>
@@ -546,7 +631,7 @@ namespace NetChart
         /// </summary>
         /// <param name="output"></param>
         /// <param name="comparer"></param>
-        private void SortOutputData(Output output, DataComparer comparer)
+        private void SortOutputData(OutputSeries outputSeries, DataComparer comparer)
         {
             //var a1 =output.VariableData;
             //var a2 = output.DimensionData;
@@ -556,30 +641,30 @@ namespace NetChart
             object auxZVariable = null;
 
             //la z puede o no aparecer
-            bool checkZ = (output.ZVariableData != null && (output.DimensionData.Length == output.ZVariableData.Length));
+            bool checkZ = (outputSeries.ZVariableData != null && (outputSeries.DimensionData.Length == outputSeries.ZVariableData.Length));
             bool ordered = true;
 
             do
             {
                 ordered = true;
-                for (int i = 0; i < output.DimensionData.Length - 1; ++i)
+                for (int i = 0; i < outputSeries.DimensionData.Length - 1; ++i)
                 {
-                    if (comparer.Compare(output.DimensionData[i], output.DimensionData[i + 1]) > 0)
+                    if (comparer.Compare(outputSeries.DimensionData[i], outputSeries.DimensionData[i + 1]) > 0)
                     {
                         ordered = false;
-                        auxVariable = output.VariableData[i];
-                        output.VariableData[i] = output.VariableData[i + 1];
-                        output.VariableData[i + 1] = auxVariable;
+                        auxVariable = outputSeries.VariableData[i];
+                        outputSeries.VariableData[i] = outputSeries.VariableData[i + 1];
+                        outputSeries.VariableData[i + 1] = auxVariable;
 
-                        auxDimension = output.DimensionData[i];
-                        output.DimensionData[i] = output.DimensionData[i + 1];
-                        output.DimensionData[i + 1] = auxDimension;
+                        auxDimension = outputSeries.DimensionData[i];
+                        outputSeries.DimensionData[i] = outputSeries.DimensionData[i + 1];
+                        outputSeries.DimensionData[i + 1] = auxDimension;
 
                         if (checkZ)
                         {
-                            auxZVariable = output.ZVariableData[i];
-                            output.ZVariableData[i] = output.ZVariableData[i + 1];
-                            output.ZVariableData[i + 1] = output.ZVariableData[i];
+                            auxZVariable = outputSeries.ZVariableData[i];
+                            outputSeries.ZVariableData[i] = outputSeries.ZVariableData[i + 1];
+                            outputSeries.ZVariableData[i + 1] = outputSeries.ZVariableData[i];
                         }
                     }
                 }
@@ -590,8 +675,180 @@ namespace NetChart
         /// Obtine las sugerencias recomendadas para los datos especificados
         /// </summary>
         /// <returns></returns>
+        /// <remarks>
+        /// El codigo de las sugerencias se podría refactorizar pero por legilibilidad se define las reglas
+        /// de cada gráfico de manera independiente
+        /// </remarks>
         private int[] GetSuggestions()
         {
+            var results = new List<int>();
+            results.Add((int)ChartTypeEnum.Debug);
+
+            //defino algunas funciones auxiliares con las comprobaciones habituales para facilitar la 
+            //lectura de las reglas
+            Func<bool> varDiscreteOrContinuous = () =>
+            {
+                return this.VariableProperty.DisplayType == VariableTypeEnum.Discrete
+                || this.VariableProperty.DisplayType == VariableTypeEnum.Continuous;
+            };
+            Func<bool> dimNoDefinedOrOrdinal = () =>
+            {
+                return this.DimensionProperty.IsDefined == false
+                || (this.DimensionProperty.IsDefined && this.DimensionProperty.DisplayType == VariableTypeEnum.Ordinal);
+            };
+            Func<bool> dimDefined = () =>
+            {
+                return this.DimensionProperty.IsDefined;
+            };
+            Func<bool> dimDiscreteOrContinuous = () =>
+            {
+                return this.DimensionProperty.IsDefined
+                    && (this.DimensionProperty.DisplayType == VariableTypeEnum.Discrete
+                    || this.DimensionProperty.DisplayType == VariableTypeEnum.Continuous);
+            };
+            Func<bool> dimDiscreteOrContinuousOrOrdinal = () =>
+            {
+                return this.DimensionProperty.IsDefined
+                    && (this.DimensionProperty.DisplayType == VariableTypeEnum.Discrete
+                    || this.DimensionProperty.DisplayType == VariableTypeEnum.Continuous
+                    || this.DimensionProperty.DisplayType == VariableTypeEnum.Ordinal);
+            };
+            Func<bool> zVarDiscreteOrContinuous = () =>
+            {
+                return this.ZVariableProperty.IsDefined &&
+                (this.ZVariableProperty.DisplayType == VariableTypeEnum.Discrete
+                || this.ZVariableProperty.DisplayType == VariableTypeEnum.Continuous);
+            };
+            Func<bool> zVarDefined = () =>
+            {
+                return this.ZVariableProperty.IsDefined;
+            };
+            Func<bool> seriesDefined = () =>
+            {
+                return this.SerieProperty.IsDefined;
+            };
+
+            //variable siempre esta definida, se valida en ValidateConfiguration            
+
+            //1-Histogram
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && !seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.Histogram);
+            }
+
+            //2-Line
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && !seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.Histogram);
+            }
+
+            //3-Scatter
+            if (varDiscreteOrContinuous() && dimDiscreteOrContinuousOrOrdinal()
+                && !zVarDefined() && !seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.Scatter);
+            }
+
+            //4-Bubble
+            if (varDiscreteOrContinuous() && dimDiscreteOrContinuousOrOrdinal()
+                && zVarDefined() && !seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.Bubble);
+            }
+
+            //5-Temperature
+            if (varDiscreteOrContinuous() && dimDiscreteOrContinuous()
+                && !zVarDefined() && seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.Temperature);
+            }
+
+            //6-Pie
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && seriesDefined()) //con la serie definimos el quesito
+            {
+                results.Add((int)ChartTypeEnum.Pie);
+            }
+
+            //7-Radar
+            if (varDiscreteOrContinuous() && dimDefined()
+                && !zVarDefined() && !seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.Radar);
+            }
+
+            //8-Area3D
+            if (varDiscreteOrContinuous() && dimDiscreteOrContinuousOrOrdinal()
+                && zVarDiscreteOrContinuous() && !seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.Area3D);
+            }
+
+            //9-Waterfall
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && !seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.Waterfall);
+            }
+
+            //10-AttachedColumnPercentage
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.AttachedColumnPercentage);
+            }
+
+            //11-AttachedColumn
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.AttachedColumn);
+            }
+
+            //12-OverlapAreaPercentage
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.OverlapAreaPercentage);
+            }
+
+            //13-OverlapArea
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.OverlapArea);
+            }
+
+            //todo: Comparacion (Unico) lineal o de fiebre ?? es un tipo nuevo o linea
+
+            //14-MultipleColumn
+            if (varDiscreteOrContinuous() && dimDefined()
+                && !zVarDefined() && seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.MultipleColumn);
+            }
+
+            //15-MultipleLine
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.MultipleLine);
+            }
+
+            //16-MultipleBar
+            if (varDiscreteOrContinuous() && !dimDefined()
+                && !zVarDefined() && seriesDefined())
+            {
+                results.Add((int)ChartTypeEnum.MultipleBar);
+            }
+
+            //todo: comparacion (entre objetos) columnas
+
+            return results.ToArray();
+
+            /* ESTO ES LO VIEJO, BORRARLO CUANDO ACABE
             var results = new List<int>();
             results.Add((int)ChartTypeEnum.Debug);
             //OJO, las variables cuantitaticas discretas pueden tratarse como continuas,
@@ -697,15 +954,12 @@ namespace NetChart
                         throw new NotSupportedException();
                 }
 
-                //TODO: consultar esto con monitor o yussef
-                //results.Add(ChartTypeEnum.Bar.ToString());
-                //results.Add(ChartTypeEnum.Line.ToString());
-                //results.Add(ChartTypeEnum.Pie.ToString());
-                //results.Add(ChartTypeEnum.Radar.ToString());
-                //results.Add(ChartTypeEnum.Scatter.ToString());
+
+
             }
 
             return results.ToArray();
+            */
         }
 
     }

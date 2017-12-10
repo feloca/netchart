@@ -67,7 +67,7 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Bar;
+            chart.ChartType = ChartTypeEnum.Histogram;
             if(tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
@@ -101,7 +101,7 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Bar;
+            chart.ChartType = ChartTypeEnum.Histogram;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
@@ -118,7 +118,7 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Bar;
+            chart.ChartType = ChartTypeEnum.Histogram;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
@@ -135,7 +135,7 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Bar;
+            chart.ChartType = ChartTypeEnum.Histogram;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
@@ -152,7 +152,7 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Bar;
+            chart.ChartType = ChartTypeEnum.Histogram;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;

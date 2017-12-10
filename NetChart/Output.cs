@@ -33,25 +33,29 @@ namespace NetChart
         /// </summary>
         public string ZVariableInfo { get; set; }
 
-        //incluir propiedades de presentacion, usar una subclase para agruparlo
+        ////variables sin dimensiones
+        ///// <summary>
+        ///// Obtiene o establece los datos procesados del eje y
+        ///// </summary>
+        //public object[] VariableData { get; set; }
 
-        //public object[] ComputedPropertyData { get; set; }
+        ///// <summary>
+        ///// Obtiene o establece los datos procesados del eje x
+        ///// </summary>
+        //public object[] DimensionData { get; set; }
 
-        //public object[] ComputedSecondPropertyData { get; set; }
+        ///// <summary>
+        ///// Obtine o establece los datos procesados del eje z
+        ///// </summary>
+        //public object[] ZVariableData { get; set; }
+
+        public OutputSeries[] Series { get; set; }
 
         /// <summary>
-        /// Obtiene o establece los datos procesados del eje y
+        /// Obtiene o establece todas las dimensiones definidas en las distintas series de un 
+        /// gráfico, solamente aplica a graficos con series que empleen la dimensión o en el modo
+        /// de depuracion siempre que se seleccione una propiedad de serie.
         /// </summary>
-        public object[] VariableData { get; set; }
-
-        /// <summary>
-        /// Obtiene o establece los datos procesados del eje x
-        /// </summary>
-        public object[] DimensionData { get; set; }
-
-        /// <summary>
-        /// Obtine o establece los datos procesados del eje z
-        /// </summary>
-        public object[] ZVariableData { get; set; }
+        public object[] SeriesDimensions { get; set; }
     }
 }

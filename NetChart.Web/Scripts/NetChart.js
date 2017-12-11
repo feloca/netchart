@@ -23,6 +23,9 @@
         'Waterfall', 'AttachedColumnPercentage', 'AttachedColumn', 'OverlapAreaPercentage', 'OverlapArea',
         'MultipleColumn', 'MultipleLine', 'MultipleBar'];
 
+    //Estos valores deben corresponderse con el enumerado VariableTypeEnum
+    const nc_displayTypes = ['Discrete', 'Continuous', 'Nominal', 'Ordinal'];
+
     //Paleta de colores por defecto -> 14
     const nc_colors = ['navy', 'blue', 'aqua', 'teal', 'olive', 'green', 'lime', 'yellow', 'orange', 'red', 'maroon', 'fuchsia', 'purple', 'gray'];
 
@@ -64,6 +67,10 @@
         //data_obj.Series[0].VariableData; //[] -> la y -> ESTA ES LA PROPIEDAD PRINCIPAL, A TOMAR DE REFERENCIA EN TODOS LOS GRÁFICOS
         //data_obj.Series[0].DimensionData; //[] -> la x
         //data_obj.Series[0].ZVariableData; //[]
+        //data_obj.Display.Title; -> titulo del grafico
+        //data_obj.Display.VariableDisplayType; -> tipo de dato visual y
+        //data_obj.Display.DimensionDisplayType; -> tipo de dato visual x
+        //data_obj.Display.ZVariableDisplayType; -> tipo de dato visual z
 
         switch (nc_types[dataObj.ChartType]) {
             case 'Debug':
@@ -726,50 +733,91 @@
         //todo: cuando defina los parametros de configuración (titulo, leyenda,etc) meterlos aqui
         let chartX = 30,
             chartY = 30,
-            chartWidth = width - (chartX * 2),
+            chartWidth = width - (chartX * 3),
             chartHeight = height - (chartY * 2);
+
+        //todo: la siguiente linea tendria que depender del tipo de grafico, si no existen comentarios o ejes ajustar mejor
+        chartX = chartX * 2; //dejo 2 partes a la izquierda para usar una de ellas para los textos del eje y
         let svgChart = nc_createSVG(parentSVG, chartX, chartY, chartWidth, chartHeight);
 
-        //creamos el eje y
-        let maxRange = nc_maxValue(data.VariableData);
-        let minRange = nc_minValue(data.VariableData);
-        if (minRange > 0) {
-            minRange = 0;
-        }//todo: revisar si gestiono negativos
-
-        //434 y max, y coge 494
-        let scaleY = nc_createScaleLinear(0, chartHeight, minRange, maxRange)
-        nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
-        for (let i = 0; i < data.VariableData.length; ++i) {
-            nc_createText(parentSVG, chartX - 20,
-                chartHeight - scaleY.getDomainValue(data.VariableData[i]) + chartY,
-                data.VariableData[i]);
-        }
-
-        //creamos el eje x
-        nc_createLine(parentSVG, chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight, 'black');
-        let columnWidth = chartWidth / data.DimensionData.length;
-        let columnCenter = columnWidth / 2;
-        for (let i = 0; i < data.DimensionData.length; ++i) {
-            nc_createText(parentSVG, (i * columnWidth) + columnCenter, chartY + chartHeight + 15, data.DimensionData[i]);
-        }
-
         //creo el titulo
-        let title = nc_createText(parentSVG, '50%', 20, 'EL TITULO');
-        //alignment-baseline="middle" text-anchor="middle"
-        //nc_appendAttribute(title, 'alignment-baseline', 'middle');
+        let title = nc_createText(parentSVG, '50%', 20, data.Display.Title);
         nc_appendAttribute(title, 'text-anchor', 'middle');
         nc_appendAttribute(title, 'font-weight', 'bold');
 
+        let maxYRange = Number.MIN_SAFE_INTEGER;
+        let minYRange = Number.MAX_SAFE_INTEGER;
+        for(let i = 0; i < data.Series.length; ++i){
+            let series = data.Series[i];
+            let maxSerie = nc_maxValue(series.VariableData);
+            let minSerie = nc_minValue(series.VariableData);
+            if (maxSerie > maxYRange) {
+                maxYRange = maxSerie;
+            }
+            if (minSerie < minYRange) {
+                minYRange = minSerie;
+            }
+        }
+        if (minYRange > 0) {
+            minYRange = 0;
+        }//todo: revisar si gestiono negativos
+
+        //el eje y siempre tiene numeros, el eje x puede tener cadenas (pasos) o numeros
+        nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
+        let scaleY = nc_createScaleLinear(0, chartHeight, minYRange, maxYRange);
+        let verticalMarks = 4; //100, 75, 50, 25, 0
+        let verticalGap = (maxYRange - minYRange) / verticalMarks;
+        for (let i = 0; i < verticalMarks + 1; ++i) {
+            nc_createText(parentSVG, chartX - 40,
+                chartHeight - scaleY.getDomainValue(minYRange + (i*verticalGap)) + chartY,
+                (minYRange + (i * verticalGap)) );
+        }
+
+        //el eje x puede tener numeros y cadenas asi como pasos o evolucion lineal
+        let maxXRange = Number.MIN_SAFE_INTEGER;
+        let minXRange = Number.MAX_SAFE_INTEGER;
+        nc_createLine(parentSVG, chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight, 'black');
+        if (data.SeriesDimensions != null) {
+            //si tenemos los valores de la dimension definidos los usamos
+            //el primer caso es que sean textos
+            if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
+                let columnWidth = chartWidth / data.SeriesDimensions.length;
+                let columnCenter = columnWidth / 2;
+                for (let i = 0; i < data.SeriesDimensions.length; ++i) {
+                    nc_createText(parentSVG, (i * columnWidth) + columnCenter, chartY + chartHeight + 15, data.SeriesDimensions[i]);
+                }
+            } else {
+            //el segundo caso es que sean numeros
+                maxXRange = nc_maxValue(data.SeriesDimesions);
+                minXRange = nc_minValue(data.SeriesDimesions);
+                let scaleX = nc_createScaleLinear(0, chartWidth, minXRange, maxXRange);
+                for (let i = 0; i < data.SeriesDimesions.length; ++i) {
+                    nc_createText(parentSVG, scaleX(data.SeriesDimensions[i]), chartY + chartHeight + 15, data.SeriesDimensions[i]);
+                }
+            }
+        } else {
+            //por ultimo, si no esta definida los campos de la dimension tendremos que calcularlos
+            //aqui NO pueden existir varias series
+            let series = data.Series[0];
+            if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
+                //let computedDimensions = //nc_distinct(series.DimensionData);
+                let columnWidth = chartWidth / series.DimensionData.length;
+                let columnCenter = columnWidth / 2;
+                for (let i = 0; i < series.DimensionData.length; ++i) {
+                    nc_createText(parentSVG, (i * columnWidth) + columnCenter, chartY + chartHeight + 15, series.DimensionData[i]);
+                }
+            } else {
+                maxXRange = nc_maxValue(data.SeriesDimesions);
+                minXRange = nc_minValue(data.SeriesDimesions);
+                let scaleX = nc_createScaleLinear(0, chartWidth, minXRange, maxXRange);
+                for (let i = 0; i < series.DimensionData.length; ++i) {
+                    nc_createText(parentSVG, scaleX(series.DimensionData), chartY + chartHeight + 15, series.DimensionData);
+                }
+            }
+        }
+
         return svgChart;
     }
-
-    //function nc_drawChartLine() { }
-    //function nc_drawChartScatter() { }
-    //function nc_drawChartBubble() { }
-    //function nc_drawChartTemperature() { }
-    //function nc_drawChartPie() { }
-    //function nc_drawChartRadar() { }
 
     //Añade un nodo hijo a un nodo
     //function nc_appendChild(parentNode, childNode) {

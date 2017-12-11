@@ -180,7 +180,7 @@ namespace NetChart
         }
 
         /// <summary>
-        /// 
+        /// Obtiene o establece el tipo de grafico a representar
         /// </summary>
         /// <remarks>
         /// establece el tipo de grafica
@@ -210,6 +210,11 @@ namespace NetChart
         }
 
         /// <summary>
+        /// Obtiene o establece el título del gráfico a mostrar
+        /// </summary>
+        public string Title { get; set; }
+
+        /// <summary>
         /// Esto deberia devolver el json con la configuracion y los datos, la configuracion deberia de estar en una propiedad bajo demanda
         /// </summary>
         /// <returns></returns>
@@ -232,7 +237,7 @@ namespace NetChart
                 throw new NetChartException(Message.ErrorConfigurationNoData);
             }
             var output = new Output();
-            output.ChartType = ((int)this.ChartType).ToString();
+            output.ChartType = ((int)this.ChartType);
 
             if (this.ChartType == ChartTypeEnum.Debug)
             {
@@ -241,6 +246,9 @@ namespace NetChart
                 output.DimensionInfo = this.GetPropertyDebugInfo(this.DimensionProperty);
                 output.ZVariableInfo = this.GetPropertyDebugInfo(this.ZVariableProperty);
             }
+
+            //Configuramos los aspectos visuales
+            this.AddDisplayOutputData(output);
 
             //Formateamos y cargamos los datos en la salida
             this.AddOutputData(output);
@@ -669,6 +677,19 @@ namespace NetChart
                     }
                 }
             } while (ordered == false);
+        }
+
+        /// <summary>
+        /// Añade a la salida los parametros de visualizacion
+        /// </summary>
+        /// <param name="output"></param>
+        private void AddDisplayOutputData(Output output)
+        {
+            output.Display = new OutputDisplay();
+            output.Display.Title = this.Title ?? string.Empty;
+            output.Display.VariableDisplayType = (int)this.VariableProperty.DisplayType;
+            output.Display.DimensionDisplayType = (int)this.DimensionProperty.DisplayType;
+            output.Display.ZVariableDisplayType = (int)this.ZVariableProperty.DisplayType;
         }
 
         /// <summary>

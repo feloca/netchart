@@ -68,6 +68,7 @@ namespace NetChart.Web.Controllers
             var chart = new Chart<Persona>();
             chart.Data = data;
             chart.ChartType = ChartTypeEnum.Histogram;
+            chart.Title = "Histograma";
             if(tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;

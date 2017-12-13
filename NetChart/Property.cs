@@ -103,6 +103,7 @@ namespace NetChart
                 //todo: validar si es un string que no se establezcan los tipos invalidos
                 //basicamente si el tipo es un numero y lo tratamos como cadena puede dar 
                 //error al agregar
+                //todo: esto hay que revisarlo, un ordinal puede ser un discreto
                 var realType = DataHelper.GetPropertyDisplayType(WorkType, this.Name);
                 if (realType != VariableTypeEnum.Discrete
                     && realType != VariableTypeEnum.Continuous)

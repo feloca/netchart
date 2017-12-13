@@ -1,0 +1,69 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<ClassDiagram MajorVersion="1" MinorVersion="1">
+  <Class Name="NetChart.Chart&lt;T&gt;">
+    <Position X="0.5" Y="0.5" Width="2.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>UACAAAAAIAAAAUIUBAAAoAARAQAkgpAAAAAIAEigAGA=</HashCode>
+      <FileName>Chart.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetChart.Property&lt;T&gt;">
+    <Position X="4.25" Y="0.5" Width="1.5" />
+    <Compartments>
+      <Compartment Name="Fields" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AAIBIAAICAAAAAAAAAAAAAQAAQAAAAAAAAIAAAAAgQA=</HashCode>
+      <FileName>Property.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetChart.Output">
+    <Position X="4.25" Y="4.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>QAQAAAAAAAAAAAAAAAAAAUAAAAAAAAAAAABAAAAAAIk=</HashCode>
+      <FileName>Output.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetChart.OutputDetail&lt;T&gt;">
+    <Position X="6.5" Y="7.5" Width="2" />
+    <Compartments>
+      <Compartment Name="Methods" Collapsed="true" />
+    </Compartments>
+    <TypeIdentifier>
+      <HashCode>AgAAAAAAAAAAAAAABAAAAAAAAAAAABAAAAAAAAAAAAA=</HashCode>
+      <FileName>OutputDetail.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetChart.OutputSeries">
+    <Position X="6.5" Y="4.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAEAAAAAIEAAAAAAAAAAAAAAAAAAAAAAAACA=</HashCode>
+      <FileName>OutputSeries.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Class Name="NetChart.OutputDisplay">
+    <Position X="8.75" Y="4.25" Width="2" />
+    <TypeIdentifier>
+      <HashCode>AAAAAAAAAAAAAEAAACAAAAAAAAAAAAAAkAAAAAAAAAA=</HashCode>
+      <FileName>OutputDisplay.cs</FileName>
+    </TypeIdentifier>
+  </Class>
+  <Enum Name="NetChart.AggregateEnum">
+    <Position X="6.5" Y="0.5" Width="1.5" />
+    <TypeIdentifier>
+      <HashCode>gCAAAACAAAAAAAAAAAAAAAQAAAAAAAABAAAAAAAAAAQ=</HashCode>
+      <FileName>AggregateEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Enum Name="NetChart.ChartTypeEnum">
+    <Position X="11.5" Y="0.5" Width="2" />
+    <TypeIdentifier>
+      <HashCode>EQBAAwAAAAEAAIAAAAACAAAgIAQAAAQAAACCAAAFAAE=</HashCode>
+      <FileName>ChartTypeEnum.cs</FileName>
+    </TypeIdentifier>
+  </Enum>
+  <Font Name="Segoe UI" Size="9" />
+</ClassDiagram>

@@ -104,6 +104,9 @@ namespace NetChart
                 //basicamente si el tipo es un numero y lo tratamos como cadena puede dar 
                 //error al agregar
                 //todo: esto hay que revisarlo, un ordinal puede ser un discreto
+                //todo: ¿revisar esta funcionalidad, se puede mejorar o asi esta bien? 
+                //si existe agregacion que tipo devuelve?, ahora mismo se omite el tipo hasta que se preparan los datos de salida, 
+                //al validar si el tipo definido no esta permitido por la agregacion se produce una excepcion
                 var realType = DataHelper.GetPropertyDisplayType(WorkType, this.Name);
                 if (realType != VariableTypeEnum.Discrete
                     && realType != VariableTypeEnum.Continuous)

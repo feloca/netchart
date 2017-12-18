@@ -50,7 +50,7 @@
             nc_selection = selector;
         }
 
-        return nc;//probar esto
+        return nc;
     }
 
     //funcion que dibuja el grafico JS, reciba el JSON con los datos

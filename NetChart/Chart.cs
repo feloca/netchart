@@ -762,7 +762,7 @@ namespace NetChart
             if (varDiscreteOrContinuous() && !dimDefined()
                 && !zVarDefined() && !seriesDefined())
             {
-                results.Add((int)ChartTypeEnum.Histogram);
+                results.Add((int)ChartTypeEnum.Line);
             }
 
             //3-Scatter

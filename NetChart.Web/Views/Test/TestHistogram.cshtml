@@ -1,12 +1,12 @@
 ﻿@model IEnumerable<NetChart.GeneradorDatos.Persona>
 
 @{
-    ViewBag.Title = "Test Bar";
+    ViewBag.Title = "Test Histogram";
 }
 
 <h2>Test Bar</h2>
 
-@Html.ActionLink("Modo Depuracion", "TestBar", new { tipo = 0 }) | @Html.ActionLink("Modo Presentacion", "TestBar")
+@Html.ActionLink("Modo Depuracion", "TestHistogram", new { tipo = 0 }) | @Html.ActionLink("Modo Presentacion", "TestHistogram")
 <div style="width:1000px;height:500px;">
     <div id="grafico" style="border:double;width:100%;height:100%;float:left;">
         <h1>Caja para el grafico</h1>

@@ -24,8 +24,8 @@ namespace NetChart.Web.Controllers
                 },
                 new TestVM()
                 {
-                    Description = "Test gráfico de barras",
-                    Method = "TestBar"
+                    Description = "Test gráfico histograma",
+                    Method = "TestHistogram"
                 },
                 new TestVM()
                 {
@@ -62,7 +62,7 @@ namespace NetChart.Web.Controllers
             return View();
         }
 
-        public ActionResult TestBar(int? tipo)
+        public ActionResult TestHistogram(int? tipo)
         {
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
@@ -75,7 +75,7 @@ namespace NetChart.Web.Controllers
             }
             chart.VariablePropertyName = "Altura";
             //chart.VariableProperty.Aggregation;
-            chart.DimensionPropertyName = "Nacionalidad";
+            //chart.DimensionPropertyName = "Nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }

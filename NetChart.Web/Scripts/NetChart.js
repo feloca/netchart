@@ -792,7 +792,7 @@
                 minXRange = nc_minValue(data.SeriesDimesions);
                 let scaleX = nc_createScaleLinear(0, chartWidth, minXRange, maxXRange);
                 for (let i = 0; i < data.SeriesDimesions.length; ++i) {
-                    nc_createText(parentSVG, scaleX(data.SeriesDimensions[i]), chartY + chartHeight + 15, data.SeriesDimensions[i]);
+                    nc_createText(parentSVG, scaleX.getDomainValue(data.SeriesDimensions[i]), chartY + chartHeight + 15, data.SeriesDimensions[i]);
                 }
             }
         } else {
@@ -807,11 +807,11 @@
                     nc_createText(parentSVG, (i * columnWidth) + columnCenter, chartY + chartHeight + 15, series.DimensionData[i]);
                 }
             } else {
-                maxXRange = nc_maxValue(data.SeriesDimesions);
-                minXRange = nc_minValue(data.SeriesDimesions);
+                maxXRange = nc_maxValue(series.DimensionData);
+                minXRange = nc_minValue(series.DimensionData);
                 let scaleX = nc_createScaleLinear(0, chartWidth, minXRange, maxXRange);
                 for (let i = 0; i < series.DimensionData.length; ++i) {
-                    nc_createText(parentSVG, scaleX(series.DimensionData), chartY + chartHeight + 15, series.DimensionData);
+                    nc_createText(parentSVG, scaleX.getDomainValue(series.DimensionData[i]), chartY + chartHeight + 15, series.DimensionData[i]);
                 }
             }
         }
@@ -827,9 +827,11 @@
     //Añade un atributo a un nodo
     function nc_appendAttribute(node, attrName, attrValue) {
         //node.hasAttribute(attrName) //TODO: mirar esto
-        let attr = nc_document.createAttribute(attrName);
-        attr.value = attrValue;
-        node.setAttributeNode(attr);
+        //let attr = nc_document.createAttribute(attrName);
+        //attr.value = attrValue;
+        //node.setAttributeNode(attr);
+        //createAttribute no esta recomendado
+        node.setAttribute(attrName, attrValue);
     }
 
     //Añade un estilo a un nodo

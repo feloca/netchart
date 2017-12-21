@@ -65,17 +65,22 @@ namespace NetChart.Web.Controllers
         public ActionResult TestHistogram(int? tipo)
         {
             var data = Generator.GenerarPersonas(10);
+            //Nuevo gráfico asociado a un tipo especifico
             var chart = new Chart<Persona>();
+            //Asignamos colección de datos
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Histogram;
-            chart.Title = "Histograma";
+            //Asignarmos el tipo elegido
+            chart.ChartType = ChartTypeEnum.Histogram;            
+            //Si quisiéramos recomendaciones indicamos modo depuración
             if(tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
             }
+            //Asignamos la variable principal
             chart.VariablePropertyName = "Altura";
-            //chart.VariableProperty.Aggregation;
-            //chart.DimensionPropertyName = "Nacionalidad";
+            //Indicamos el titulo del grafico
+            chart.Title = "Altura del grupo";
+            //Generamos datos JSON y los compartimos con la vista
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }

@@ -342,6 +342,7 @@
 
     //Esta funcion muestra un mensaje generico cuando un tipo de grafico no esta implementado todavía, borrar cuando este completo
     function nc_drawChartNotImplemented(data) {
+        //let svgRoot = nc_getSVGRoot();        
         let result =
             '<h4>Selected graph is not implemented</h4>' +
             '<br/>' +
@@ -349,8 +350,9 @@
             '        <label>Chart type: </label>' +
             nc_types[data.ChartType] +
             '</div>';
-
-        nc_selection.innerHTML = '';
+        
+        nc_selection.innerHTML = result;
+        //nc_selection.appendChild(svgRoot);
     }
 
     //Esta función dibuja un gráfico de barras vertical
@@ -762,13 +764,17 @@
             minYRange = 0;
         }//todo: revisar si gestiono negativos
 
+        //espacio reservado para el contenido del eje y y del eje x
+        let leftAxisGap = 40;
+        let bottomAxisGap = 15;
+
         //el eje y siempre tiene numeros, el eje x puede tener cadenas (pasos) o numeros
         nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
         let scaleY = nc_createScaleLinear(0, chartHeight, minYRange, maxYRange);
         let verticalMarks = 4; //100, 75, 50, 25, 0
         let verticalGap = (maxYRange - minYRange) / verticalMarks;
         for (let i = 0; i < verticalMarks + 1; ++i) {
-            nc_createText(parentSVG, chartX - 40,
+            nc_createText(parentSVG, chartX - leftAxisGap,
                 chartHeight - scaleY.getDomainValue(minYRange + (i*verticalGap)) + chartY,
                 (minYRange + (i * verticalGap)) );
         }
@@ -781,18 +787,18 @@
             //si tenemos los valores de la dimension definidos los usamos
             //el primer caso es que sean textos
             if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
-                let columnWidth = chartWidth / data.SeriesDimensions.length;
+                let columnWidth = (chartWidth - chartX) / data.SeriesDimensions.length;
                 let columnCenter = columnWidth / 2;
                 for (let i = 0; i < data.SeriesDimensions.length; ++i) {
-                    nc_createText(parentSVG, (i * columnWidth) + columnCenter, chartY + chartHeight + 15, data.SeriesDimensions[i]);
+                    nc_createText(parentSVG, (i * columnWidth) + columnCenter + chartX, chartY + chartHeight + bottomAxisGap, data.SeriesDimensions[i]);
                 }
             } else {
             //el segundo caso es que sean numeros
                 maxXRange = nc_maxValue(data.SeriesDimesions);
                 minXRange = nc_minValue(data.SeriesDimesions);
-                let scaleX = nc_createScaleLinear(0, chartWidth, minXRange, maxXRange);
+                let scaleX = nc_createScaleLinear(0, chartWidth - chartX, minXRange, maxXRange);
                 for (let i = 0; i < data.SeriesDimesions.length; ++i) {
-                    nc_createText(parentSVG, scaleX.getDomainValue(data.SeriesDimensions[i]), chartY + chartHeight + 15, data.SeriesDimensions[i]);
+                    nc_createText(parentSVG, scaleX.getDomainValue(data.SeriesDimensions[i]) + chartX, chartY + chartHeight + bottomAxisGap, data.SeriesDimensions[i]);
                 }
             }
         } else {
@@ -801,17 +807,17 @@
             let series = data.Series[0];
             if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
                 //let computedDimensions = //nc_distinct(series.DimensionData);
-                let columnWidth = chartWidth / series.DimensionData.length;
+                let columnWidth = (chartWidth - chartX) / series.DimensionData.length;
                 let columnCenter = columnWidth / 2;
                 for (let i = 0; i < series.DimensionData.length; ++i) {
-                    nc_createText(parentSVG, (i * columnWidth) + columnCenter, chartY + chartHeight + 15, series.DimensionData[i]);
+                    nc_createText(parentSVG, (i * columnWidth) + columnCenter + chartX, chartY + chartHeight + bottomAxisGap, series.DimensionData[i]);
                 }
             } else {
                 maxXRange = nc_maxValue(series.DimensionData);
                 minXRange = nc_minValue(series.DimensionData);
-                let scaleX = nc_createScaleLinear(0, chartWidth, minXRange, maxXRange);
+                let scaleX = nc_createScaleLinear(0, chartWidth - chartX, minXRange, maxXRange);
                 for (let i = 0; i < series.DimensionData.length; ++i) {
-                    nc_createText(parentSVG, scaleX.getDomainValue(series.DimensionData[i]), chartY + chartHeight + 15, series.DimensionData[i]);
+                    nc_createText(parentSVG, scaleX.getDomainValue(series.DimensionData[i]) + chartX, chartY + chartHeight + bottomAxisGap, series.DimensionData[i]);
                 }
             }
         }

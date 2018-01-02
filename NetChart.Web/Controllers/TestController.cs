@@ -113,7 +113,7 @@ namespace NetChart.Web.Controllers
             }
             chart.VariablePropertyName = "Altura";
             chart.VariableProperty.Aggregation = AggregateEnum.Average;
-            chart.DimensionPropertyName = "Nacionalidad";
+            chart.DimensionPropertyName = "Estudios";
             chart.Title = "Media de altura por nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);

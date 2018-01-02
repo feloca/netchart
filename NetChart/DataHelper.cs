@@ -173,7 +173,10 @@ namespace NetChart
                 case "String":
                     throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
                 default:
-                    //var asd = property.PropertyType.Name;
+                    if (property.PropertyType.IsEnum)
+                    {
+                        throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
+                    }
                     throw new NotSupportedException();
             }
 
@@ -194,21 +197,24 @@ namespace NetChart
             switch (property.PropertyType.Name)
             {
                 case "Float":
-                    data.Average(x => (float)property.GetValue(x));
+                    result = data.Average(x => (float)property.GetValue(x));
                     break;
                 case "Decimal":
-                    data.Average(x => (decimal)property.GetValue(x));
+                    result = data.Average(x => (decimal)property.GetValue(x));
                     break;
                 case "Int32":
                     result = data.Average(x => (int)property.GetValue(x));
                     break;
                 case "Long":
-                    data.Average(x => (long)property.GetValue(x));
+                    result = data.Average(x => (long)property.GetValue(x));
                     break;
                 case "String":
                     throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
                 default:
-                    //var asd = property.PropertyType.Name;
+                    if (property.PropertyType.IsEnum)
+                    {
+                        throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
+                    }
                     throw new NotSupportedException();
             }
 
@@ -236,7 +242,11 @@ namespace NetChart
                     result = data.Count();
                     break;
                 default:
-                    //var asd = property.PropertyType.Name;
+                    if (property.PropertyType.IsEnum)
+                    {
+                        result = data.Count();
+                        break;
+                    }
                     throw new NotSupportedException();
             }
 
@@ -257,10 +267,10 @@ namespace NetChart
             switch (property.PropertyType.Name)
             {
                 case "Float":
-                    data.Max(x => (float)property.GetValue(x));
+                    result = data.Max(x => (float)property.GetValue(x));
                     break;
                 case "Decimal":
-                    data.Max(x => (decimal)property.GetValue(x));
+                    result = data.Max(x => (decimal)property.GetValue(x));
                     break;
                 case "Int32":
                     result = data.Max(x => (int)property.GetValue(x));
@@ -272,7 +282,10 @@ namespace NetChart
                     result = data.Max(x => (string)property.GetValue(x));
                     break;
                 default:
-                    //var asd = property.PropertyType.Name;
+                    if (property.PropertyType.IsEnum)
+                    {
+                        throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);                        
+                    }
                     throw new NotSupportedException();
             }
 
@@ -308,7 +321,10 @@ namespace NetChart
                     result = data.Min(x => (string)property.GetValue(x));
                     break;
                 default:
-                    //var asd = property.PropertyType.Name;
+                    if (property.PropertyType.IsEnum)
+                    {
+                        throw new NetChartException(Message.ErrorConfigurationStringTypeInvalidAggregation);
+                    }
                     throw new NotSupportedException();
             }
 
@@ -380,6 +396,11 @@ namespace NetChart
                     data.Select(x => (string)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
                     break;
                 default:
+                    if (property.PropertyType.IsEnum)
+                    {
+                        results.AddRange(Enum.GetNames(property.PropertyType));
+                        break;
+                    }
                     throw new NotSupportedException();
             }
 
@@ -409,7 +430,14 @@ namespace NetChart
         /// <returns></returns>
         public static List<T> GetGroupRows<T>(string groupProperty, object groupPropertyValue, IEnumerable<T> data)
         {
-            var property = GetProperty(typeof(T), groupProperty);
+            var property = GetProperty(typeof(T), groupProperty);            
+            Type propertyType = property.PropertyType;
+
+            if (propertyType.IsEnum)
+            {
+                return data.Where(x => property.GetValue(x).ToString().Equals(groupPropertyValue.ToString())).ToList();
+            }
+
             return data.Where(x => property.GetValue(x).Equals(groupPropertyValue)).ToList();
         }
 

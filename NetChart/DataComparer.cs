@@ -59,7 +59,7 @@ namespace NetChart
             //gestionamos los ordinales (enumerados de momento)
             if (PropertyType.IsEnum)
             {
-                return ((int)compareX).CompareTo((int)compareY);
+                return (compareX.ToString()).CompareTo(compareY.ToString());
             }
 
             //todo: habria que ver si permitimos datos de clase y gestionarlo aquí

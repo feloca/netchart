@@ -756,7 +756,12 @@
         //creo el titulo
         let title = nc_createText(parentSVG, '50%', 20, data.Display.Title);
         nc_appendAttribute(title, 'text-anchor', 'middle');
-        nc_appendAttribute(title, 'font-weight', 'bold');
+        nc_appendAttribute(title, 'font-weight', 'bold');        
+
+        //si es un grafico que no necesita ejes devolvemos el marco limpio
+        if (nc_types[data.ChartType] == 'Pie' || nc_types[data.ChartType] == 'Radar') {
+            return svgChart;
+        }
 
         let maxYRange = Number.MIN_SAFE_INTEGER;
         let minYRange = Number.MAX_SAFE_INTEGER;

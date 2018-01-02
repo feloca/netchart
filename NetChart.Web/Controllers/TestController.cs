@@ -95,9 +95,8 @@ namespace NetChart.Web.Controllers
             {
                 chart.ChartType = ChartTypeEnum.Debug;
             }
-            chart.VariablePropertyName = "Altura";            
-            chart.VariableProperty.Aggregation = AggregateEnum.Average;
-            chart.DimensionPropertyName = "Edad";
+            chart.VariablePropertyName = "Edad";
+            chart.Title = "Edad del grupo";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -107,14 +106,15 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Histogram;
+            chart.ChartType = ChartTypeEnum.Scatter;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
             }
             chart.VariablePropertyName = "Altura";
-            //chart.VariableProperty.Aggregation;
+            chart.VariableProperty.Aggregation = AggregateEnum.Average;
             chart.DimensionPropertyName = "Nacionalidad";
+            chart.Title = "Media de altura por nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -124,7 +124,7 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Histogram;
+            chart.ChartType = ChartTypeEnum.Bubble;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
@@ -141,7 +141,7 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Histogram;
+            chart.ChartType = ChartTypeEnum.Pie;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
@@ -158,7 +158,7 @@ namespace NetChart.Web.Controllers
             var data = Generator.GenerarPersonas(10);
             var chart = new Chart<Persona>();
             chart.Data = data;
-            chart.ChartType = ChartTypeEnum.Histogram;
+            chart.ChartType = ChartTypeEnum.Radar;
             if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;

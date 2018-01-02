@@ -376,8 +376,10 @@ namespace NetChart
                 case "Long":
                     data.Select(x => (long)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
                     break;
+                case "String":
+                    data.Select(x => (string)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
+                    break;
                 default:
-                    var asd = property.PropertyType.Name;
                     throw new NotSupportedException();
             }
 

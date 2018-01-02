@@ -37,7 +37,9 @@ namespace NetChart.GeneradorDatos
 
             var nacionalidades = new string[] { "alemana", "portuguesa", "francesa", "italiana" };
             var ocupaciones = new string[] { "medico", "secretario", "estudiante", "repartidor", "empresario" };
-            var estudios = new string[] { "primaria", "secundaria", "fp", "diplomado", "doctor" };
+            //var estudios = new string[] { "primaria", "secundaria", "fp", "diplomado", "doctor" };
+            var estudios = new EstudioEnum[] { EstudioEnum.Primaria, EstudioEnum.Secundaria, EstudioEnum.FP,
+                EstudioEnum.Diplomado, EstudioEnum.Doctor};
             var ingresos = new string[] { "bajos", "medios", "altos", "muy_altos" };
 
             for (int i = 0; i < numero; ++i)

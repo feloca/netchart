@@ -350,7 +350,7 @@
             '        <label>Chart type: </label>' +
             nc_types[data.ChartType] +
             '</div>';
-        
+
         nc_selection.innerHTML = result;
         //nc_selection.appendChild(svgRoot);
     }
@@ -456,15 +456,26 @@
         let maxDimension = nc_maxValue(series.DimensionData);
         let minDimension = nc_minValue(series.DimensionData);
 
-        let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
         let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
 
-        //aquí van los puntos
-        for (let i = 0; i < series.VariableData.length; ++i) {
-            let x = scaleX.getDomainValue(series.DimensionData[i]);
-            let y = scaleY.getDomainValue(series.VariableData[i]);
+        //Creo que nunca va a ser nominal, deberia entrar numeros u ordinal. 
+        if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
+            let columnWidth = chartWidth / series.DimensionData.length;
+            let columnCenter = columnWidth / 2;
+            for (let i = 0; i < series.VariableData.length; ++i) {
+                let x = (i * columnWidth) + columnCenter;
+                let y = scaleY.getDomainValue(series.VariableData[i]);
+                nc_createCircle(svgChart, x, chartHeight - y, 5, 'teal');
+            }
+        } else {
+            let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
+            //aquí van los puntos
+            for (let i = 0; i < series.VariableData.length; ++i) {
+                let x = scaleX.getDomainValue(series.DimensionData[i]);
+                let y = scaleY.getDomainValue(series.VariableData[i]);
 
-            nc_createCircle(svgChart, x, chartHeight - y, 5, 'teal');
+                nc_createCircle(svgChart, x, chartHeight - y, 5, 'teal');
+            }
         }
 
         nc_selection.innerHTML = '';
@@ -749,7 +760,7 @@
 
         let maxYRange = Number.MIN_SAFE_INTEGER;
         let minYRange = Number.MAX_SAFE_INTEGER;
-        for(let i = 0; i < data.Series.length; ++i){
+        for (let i = 0; i < data.Series.length; ++i) {
             let series = data.Series[i];
             let maxSerie = nc_maxValue(series.VariableData);
             let minSerie = nc_minValue(series.VariableData);
@@ -775,8 +786,8 @@
         let verticalGap = (maxYRange - minYRange) / verticalMarks;
         for (let i = 0; i < verticalMarks + 1; ++i) {
             nc_createText(parentSVG, chartX - leftAxisGap,
-                chartHeight - scaleY.getDomainValue(minYRange + (i*verticalGap)) + chartY,
-                (minYRange + (i * verticalGap)) );
+                chartHeight - scaleY.getDomainValue(minYRange + (i * verticalGap)) + chartY,
+                (minYRange + (i * verticalGap)));
         }
 
         //el eje x puede tener numeros y cadenas asi como pasos o evolucion lineal
@@ -793,7 +804,7 @@
                     nc_createText(parentSVG, (i * columnWidth) + columnCenter + chartX, chartY + chartHeight + bottomAxisGap, data.SeriesDimensions[i]);
                 }
             } else {
-            //el segundo caso es que sean numeros
+                //el segundo caso es que sean numeros
                 maxXRange = nc_maxValue(data.SeriesDimesions);
                 minXRange = nc_minValue(data.SeriesDimesions);
                 let scaleX = nc_createScaleLinear(0, chartWidth - chartX, minXRange, maxXRange);

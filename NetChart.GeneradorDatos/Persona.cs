@@ -37,9 +37,9 @@ namespace NetChart.GeneradorDatos
         public string Ocupacion { get; set; }
 
         /// <summary>
-        /// Ordinal, primaria, secundaria, fp, diplomado, doctor
+        /// Ordinal primaria, secundaria, fp, diplomado, doctor
         /// </summary>
-        public string Estudios { get; set; }
+        public EstudioEnum Estudios { get; set; }
 
         /// <summary>
         /// Ordinal, bajos, medios, altos, muy_altos

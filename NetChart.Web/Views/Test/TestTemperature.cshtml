@@ -1,0 +1,78 @@
+﻿@model IEnumerable<NetChart.GeneradorDatos.Persona>
+
+@{
+    ViewBag.Title = "Test Temperature";
+}
+
+@Html.ActionLink("Modo Depuracion", "TestTemperature", new { tipo = 0 }) | @Html.ActionLink("Modo Presentacion", "TestTemperature")
+<div style="width:1000px;height:500px;">
+    <div id="grafico" style="border:solid;width:100%;height:100%;float:left;">
+        <h1>Caja para el grafico</h1>
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function(){
+            var data = @Html.Raw(ViewBag.nc_data);
+            nc.select('#grafico').draw(data);
+        });
+    </script>
+}
+
+<br />
+<h3>Datos</h3>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(model => model.Edad)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Altura)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Peso)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Tension)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Nacionalidad)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Ocupacion)
+        </th>
+        <th>
+            @Html.DisplayNameFor(model => model.Ingresos)
+        </th>
+    </tr>
+
+@foreach (var item in Model) {
+    <tr>
+        <td>
+            @Html.DisplayFor(modelItem => item.Edad)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Altura)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Peso)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Tension)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Nacionalidad)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Ocupacion)
+        </td>
+        <td>
+            @Html.DisplayFor(modelItem => item.Ingresos)
+        </td>
+    </tr>
+}
+
+</table>

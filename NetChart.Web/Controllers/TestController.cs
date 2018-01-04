@@ -44,6 +44,11 @@ namespace NetChart.Web.Controllers
                 },
                 new TestVM()
                 {
+                    Description = "Test gráfico de temperatura",
+                    Method = "TestTemperature"
+                },
+                new TestVM()
+                {
                     Description = "Test gráfico de tarta",
                     Method =  "TestPie"
                 }, 
@@ -129,11 +134,36 @@ namespace NetChart.Web.Controllers
             {
                 chart.ChartType = ChartTypeEnum.Debug;
             }
-            chart.VariablePropertyName = "Altura";
-            //chart.VariableProperty.Aggregation;
-            chart.DimensionPropertyName = "Nacionalidad";
+
+            chart.VariablePropertyName = "Altura";            
+            chart.DimensionPropertyName = "Edad";
+            chart.ZVariablePropertyName = "Peso";
+            
+            //ordenamos la salida
+            chart.OrderDimensionProperty = OrderTypeEnum.Ascending;
+            chart.Title = "Peso por altura/edad";
             ViewBag.nc_data = chart.Generate();
             return View(data);           
+        }
+
+        public ActionResult TestTemperature(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(20);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Temperature;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+            chart.VariablePropertyName = "Altura";
+            //chart.VariableProperty.Aggregation;
+            chart.DimensionPropertyName = "Edad";
+            chart.SeriePropertyName = "Nacionalidad";
+            chart.Title = "Altura por edad segun nacionalidad";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
         }
 
         public ActionResult TestPie(int? tipo)

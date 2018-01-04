@@ -219,6 +219,7 @@
     <Content Include="Views\Test\TestBubble.cshtml" />
     <Content Include="Views\Test\TestPie.cshtml" />
     <Content Include="Views\Test\TestRadar.cshtml" />
+    <Content Include="Views\Test\TestTemperature.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

@@ -49,7 +49,7 @@ namespace NetChart.GeneradorDatos
                     PersonaId = i + 1,
                     Edad = rnd.Next(15, 80),
                     Altura = rnd.Next(145, 215),
-                    Peso = (float)GetRandomFloat(65.0, 125.0),
+                    Peso = (float)GetRandomFloat(45.0, 125.0),
                     Tension = (float)GetRandomFloat(6.0, 14.0),
                     Nacionalidad = nacionalidades[rnd.Next(0, nacionalidades.Length)],
                     Ocupacion = ocupaciones[rnd.Next(0, ocupaciones.Length)],

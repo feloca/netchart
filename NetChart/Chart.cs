@@ -389,7 +389,7 @@ namespace NetChart
 
                 for (int i = 0; i < seriesValues.Count; ++i)
                 {
-                    var seriesData = DataHelper.GetGroupRows<T>(this.DimensionPropertyName, seriesValues[i], this.Data);
+                    var seriesData = DataHelper.GetGroupRows<T>(this.SeriePropertyName, seriesValues[i], this.Data);
                     var outputSeries = new OutputSeries();
                     outputSeries.Descriptor = seriesValues[i];
                     ProcessOutputSeries(outputSeries, seriesData);
@@ -412,11 +412,10 @@ namespace NetChart
                 
                 for(int i = 0; i < output.Series.Length; ++i)
                 {
-                    dimensions.AddRange(output.Series[i].DimensionData);
-                }
-
-                var dataComparer =((IEqualityComparer<object>)this.DimensionProperty.Comparer);                
-                output.SeriesDimensions = dimensions.Distinct(dataComparer).ToArray();
+                    dimensions.Add(output.Series[i].Descriptor);
+                }               
+                //NO hay repetidos porque las dimensiones vienen del filtro por valor 
+                output.SeriesDimensions = dimensions.ToArray();
             }
         }
 
@@ -576,10 +575,11 @@ namespace NetChart
             }
 
             //Ordeno las dimensiones en el caso de existir series
-            if (SerieProperty.IsDefined)
-            {
-                Array.Sort(output.SeriesDimensions, comparer);                
-            }
+            //NO TENGO CLARO QUE SE DEBAN ORDENAR LAS SERIES
+            //if (SerieProperty.IsDefined)
+            //{
+            //    Array.Sort(output.SeriesDimensions, comparer);                
+            //}
         }
 
         private DataComparer ConfigureComparer()
@@ -780,7 +780,7 @@ namespace NetChart
             }
 
             //5-Temperature
-            if (varDiscreteOrContinuous() && dimDiscreteOrContinuous()
+            if (varDiscreteOrContinuous() && dimDiscreteOrContinuous()//TODO: mirar si tambien ordinal en la dimension
                 && !zVarDefined() && seriesDefined())
             {
                 results.Add((int)ChartTypeEnum.Temperature);

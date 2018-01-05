@@ -185,10 +185,9 @@
                 break;
             case 'Temperature':
                 nc_drawChartTemperature(dataObj);
-                //todo: completar descripcion gráficos pendientes
                 chartInfo.innerHTML = 'Good for:' +
                                     '<ul>' +
-                                    '<li>TODO</li>' +
+                                    '<li>Comparison</li>' +
                                     '</ul>';
                 //'El grafico de temperatura permite representar: ';
                 break;

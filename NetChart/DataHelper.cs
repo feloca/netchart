@@ -4,33 +4,29 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
-using System.Threading.Tasks;
 
 namespace NetChart
 {
     internal class DataHelper
     {
-        //funcion -> sacar el minimo valor de una lista de una propiedad indicada (o expresion)
-        //funcion -> sacar el maximo valor de una lista de una propiedad indicada (o expresion)
-
         //calcular regla, es decir, dado un minimo y un maximo y un salto devolver un array con los valores generados
-        public void Test()
-        {
-            Func<int, bool> miFuncion = null;
+        //public void Test()
+        //{
+        //    Func<int, bool> miFuncion = null;
 
-            List<int> lista = new List<int>();
-            lista.AddRange(new int[] { 4, 5, 6 });
+        //    List<int> lista = new List<int>();
+        //    lista.AddRange(new int[] { 4, 5, 6 });
 
-            var result = lista.Where(x => x == 5);
+        //    var result = lista.Where(x => x == 5);
 
-            lista.Where(miFuncion);
+        //    lista.Where(miFuncion);
 
-            IQueryable<int> fq = null;
+        //    IQueryable<int> fq = null;
 
-            //fq.
-            //lista
+        //    //fq.
+        //    //lista
 
-        }
+        //}
 
         /// <summary>
         /// 
@@ -133,6 +129,7 @@ namespace NetChart
                 case "Int64":
                     return VariableTypeEnum.Discrete;
                 case "Single":
+                case "Float":
                 case "Decimal":
                 case "Double":
                     return VariableTypeEnum.Continuous;
@@ -158,6 +155,7 @@ namespace NetChart
             var property = GetProperty(typeof(T), propertyName);
             switch (property.PropertyType.Name)
             {
+                case "Single":
                 case "Float":
                     result = data.Sum(x => (float)property.GetValue(x));
                     break;
@@ -196,6 +194,7 @@ namespace NetChart
             var property = GetProperty(typeof(T), propertyName);
             switch (property.PropertyType.Name)
             {
+                case "Single":
                 case "Float":
                     result = data.Average(x => (float)property.GetValue(x));
                     break;
@@ -234,6 +233,7 @@ namespace NetChart
             var property = GetProperty(typeof(T), propertyName);
             switch (property.PropertyType.Name)
             {
+                case "Single":
                 case "Float":
                 case "Decimal":
                 case "Int32":
@@ -266,6 +266,7 @@ namespace NetChart
             var property = GetProperty(typeof(T), propertyName);
             switch (property.PropertyType.Name)
             {
+                case "Single":
                 case "Float":
                     result = data.Max(x => (float)property.GetValue(x));
                     break;
@@ -305,6 +306,7 @@ namespace NetChart
             var property = GetProperty(typeof(T), propertyName);
             switch (property.PropertyType.Name)
             {
+                case "Single":
                 case "Float":
                     result = data.Min(x => (float)property.GetValue(x));
                     break;
@@ -380,6 +382,7 @@ namespace NetChart
 
             switch (property.PropertyType.Name)
             {
+                case "Single":
                 case "Float":
                     data.Select(x => (float)property.GetValue(x)).Distinct().ToList().ForEach(y => results.Add(y));
                     break;

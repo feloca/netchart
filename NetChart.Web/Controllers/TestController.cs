@@ -257,8 +257,11 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
+            chart.VariablePropertyName = "Tension";
+            chart.DimensionPropertyName = "Estudios";
+            chart.ZVariablePropertyName = "Edad";            
 
-            chart.Title = "";
+            chart.Title = "Tension según nivel de estudios por edades";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -274,7 +277,11 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
-            chart.Title = "";
+            chart.VariablePropertyName = "Peso";
+            //chart.DimensionPropertyName = "Estudios";
+            //chart.ZVariablePropertyName = "Edad";
+
+            chart.Title = "Evolución pesos de la población";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -290,7 +297,11 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
-            chart.Title = "";
+            chart.VariablePropertyName = "Tension";
+            chart.VariableProperty.Aggregation = AggregateEnum.Average;
+            chart.SeriePropertyName = "Nacionalidad";
+
+            chart.Title = "Tensiones por nacionalidad en %";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -306,7 +317,11 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
-            chart.Title = "";
+            chart.VariablePropertyName = "Tension";
+            chart.VariableProperty.Aggregation = AggregateEnum.Average;
+            chart.SeriePropertyName = "Nacionalidad";
+
+            chart.Title = "Tensiones por nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -322,7 +337,11 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
-            chart.Title = "";
+            chart.VariablePropertyName = "Tension";
+            chart.VariableProperty.Aggregation = AggregateEnum.Average;
+            chart.SeriePropertyName = "Nacionalidad";
+
+            chart.Title = "Tensiones por nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -338,7 +357,11 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
-            chart.Title = "";
+            chart.VariablePropertyName = "Tension";
+            chart.VariableProperty.Aggregation = AggregateEnum.Average;
+            chart.SeriePropertyName = "Nacionalidad";
+
+            chart.Title = "Tensiones por nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -354,8 +377,11 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
+            chart.VariablePropertyName = "Edad";
+            chart.DimensionPropertyName = "Estudios";
+            chart.SeriePropertyName = "Nacionalidad";
 
-            chart.Title = "";
+            chart.Title = "Nivel de estudios según edad y nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -371,7 +397,10 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
-            chart.Title = "";
+            chart.VariablePropertyName = "Altura";            
+            chart.SeriePropertyName = "Nacionalidad";
+
+            chart.Title = "Evolución de la altura por nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -387,7 +416,10 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
-            chart.Title = "";
+            chart.VariablePropertyName = "Altura";
+            chart.SeriePropertyName = "Nacionalidad";
+
+            chart.Title = "Evolución de la altura por nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }

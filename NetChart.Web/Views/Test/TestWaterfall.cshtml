@@ -1,14 +1,31 @@
 ﻿@model IEnumerable<NetChart.GeneradorDatos.Persona>
 
 @{
-    ViewBag.Title = "TestWaterfall";
+    ViewBag.Title = "Test Waterfall";
 }
 
-<h2>TestWaterfall</h2>
+<h2>Test Watterfall</h2>
 
-<p>
-    @Html.ActionLink("Create New", "Create")
-</p>
+@Html.ActionLink("Modo Depuracion", "TestWaterfall", new { tipo = 0 }) | @Html.ActionLink("Modo Presentacion", "TestWatterfall")
+<div style="width:1000px;height:500px;">
+    <div id="grafico" style="border:solid;width:100%;height:100%;float:left;">
+        <h1>Caja para el grafico</h1>
+    </div>
+</div>
+
+@section scripts
+{
+    <script type="text/javascript">
+        $(function(){
+            var data = @Html.Raw(ViewBag.nc_data);
+            nc.select('#grafico').draw(data);
+        });
+    </script>
+}
+
+<br />
+<h3>Datos</h3>
+
 <table class="table">
     <tr>
         <th>

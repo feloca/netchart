@@ -317,8 +317,8 @@ namespace NetChart
                 throw new NetChartException(Message.ErrorConfigurationInvalidAggregation);
             }
 
-            //validar la propiedad secundaria y la agregacion
-            if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate && !this.DimensionProperty.IsDefined)
+            //validar la propiedad secundaria y la agregacion (prodria agregar por serie tambien)
+            if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate && (!this.DimensionProperty.IsDefined && !this.SerieProperty.IsDefined))
             {
                 throw new NetChartException(Message.ErrorConfigurationAggregationWithoutGroup);
             }
@@ -432,6 +432,7 @@ namespace NetChart
             //TODO: este if se puede refactorizar, los dos else internos son iguales
             if (this.VariableProperty.Aggregation != AggregateEnum.NoAggregate)
             {
+                //primero trato de agregar por la dimension, si no esta definida trato de agregar por la serie
                 if (this.DimensionProperty.IsDefined)
                 {
                     //no es nula la dimension, para cada valor de dimension hacer un grupo, en dimension poner la llave del 
@@ -445,6 +446,21 @@ namespace NetChart
                         {
                             VariableDatum = agregateValue,
                             DimensionDatum = dimensionValues[i],
+                            Data = groupRows
+                        });
+                    }
+                }
+                else if (this.SerieProperty.IsDefined)
+                {
+                    var serieValues = DataHelper.GetPropertyValues<T>(this.SeriePropertyName, seriesData);
+                    for (int i = 0; i < serieValues.Count; ++i)
+                    {
+                        var groupRows = DataHelper.GetGroupRows<T>(this.SeriePropertyName, serieValues[i], seriesData);
+                        var agregateValue = DataHelper.CalculateAggregate<T>(this.VariableProperty.Name, this.VariableProperty.Aggregation, groupRows);
+                        details.Add(new OutputDetail<T>()
+                        {
+                            VariableDatum = agregateValue,
+                            DimensionDatum = serieValues[i],
                             Data = groupRows
                         });
                     }
@@ -867,120 +883,7 @@ namespace NetChart
 
             //todo: comparacion (entre objetos) columnas
 
-            return results.ToArray();
-
-            /* ESTO ES LO VIEJO, BORRARLO CUANDO ACABE
-            var results = new List<int>();
-            results.Add((int)ChartTypeEnum.Debug);
-            //OJO, las variables cuantitaticas discretas pueden tratarse como continuas,
-            //contemplar la posibilidad de poner un comentario al usuario
-
-            //cualitativas -> ordinal y nominal
-
-            //para los agregados -> recomendar barras
-            //para no agragados: -si tipo int o long -> recomendar barras, aunque podria usar linea
-            //                   -si tipo float o decimal -> recomendar linea
-
-            //TODO: Hacer un arbol con las propiedades y meterlo en el documento del TFM
-            VariableTypeEnum dimensionDisplayType = this.DimensionProperty.DisplayType;
-
-            //
-
-            if (this.ZVariableProperty.IsDefined)
-            {
-                //creo que en este caso no importa si la z es agregada o no, aquí va un valor discreto de z
-                switch (this.ZVariableProperty.DisplayType)
-                {
-                    case VariableTypeEnum.Continuous:
-                        results.Add((int)ChartTypeEnum.Bubble);
-                        results.Add((int)ChartTypeEnum.Temperature);
-                        break;
-                    case VariableTypeEnum.Discrete:
-                        results.Add((int)ChartTypeEnum.Bubble);
-                        results.Add((int)ChartTypeEnum.Temperature);
-                        break;
-                    case VariableTypeEnum.Nominal:
-                        //TODO: No se que poner aqui, creo deberiamos de poner una etiqueta, ¿usar una gráfico de burbujas?
-                        //results.Add(ChartTypeEnum.Bubble.ToString());
-                        throw new NotImplementedException();
-                        break;
-                    case VariableTypeEnum.Ordinal:                        
-                        throw new NotImplementedException();
-                    default:
-                        throw new NotSupportedException();
-                }
-            }
-            else
-            {
-                switch (this.VariableProperty.DisplayType)
-                {
-                    case VariableTypeEnum.Continuous:
-                        switch (this.DimensionProperty.DisplayType)
-                        {
-                            case VariableTypeEnum.Continuous:
-                                results.Add((int)ChartTypeEnum.Line);
-                                break;
-                            case VariableTypeEnum.Discrete:
-                                results.Add((int)ChartTypeEnum.Bar);
-                                results.Add((int)ChartTypeEnum.Pie);
-                                results.Add((int)ChartTypeEnum.Radar);
-                                break;
-                            case VariableTypeEnum.Nominal:
-                                results.Add((int)ChartTypeEnum.Bar);
-                                results.Add((int)ChartTypeEnum.Pie);
-                                results.Add((int)ChartTypeEnum.Radar);
-                                break;
-                            case VariableTypeEnum.Ordinal:
-                                throw new NotImplementedException();
-                            default:
-                                throw new NotSupportedException();
-                        }
-                        break;
-                    case VariableTypeEnum.Discrete:
-                        switch (this.DimensionProperty.DisplayType)
-                        {
-                            case VariableTypeEnum.Continuous:
-                                results.Add((int)ChartTypeEnum.Line);
-                                results.Add((int)ChartTypeEnum.Scatter); //este no lo tengo claro
-                                break;
-                            case VariableTypeEnum.Discrete:
-                                results.Add((int)ChartTypeEnum.Scatter);
-                                break;
-                            case VariableTypeEnum.Nominal:
-                                results.Add((int)ChartTypeEnum.Bar);
-                                results.Add((int)ChartTypeEnum.Pie);
-                                results.Add((int)ChartTypeEnum.Radar);
-                                break;
-                            case VariableTypeEnum.Ordinal:
-                                throw new NotImplementedException();
-                            default:
-                                throw new NotSupportedException();
-                        }
-                        break;
-                    case VariableTypeEnum.Nominal:
-                        switch (this.DimensionProperty.DisplayType)
-                        {
-                            case VariableTypeEnum.Continuous:
-                            case VariableTypeEnum.Discrete:
-                            case VariableTypeEnum.Nominal:
-                                results.Add((int)ChartTypeEnum.Bubble);
-                                break;
-                            case VariableTypeEnum.Ordinal:
-                                throw new NotImplementedException();
-                            default:
-                                throw new NotSupportedException();
-                        }
-                        break;
-                    default:
-                        throw new NotSupportedException();
-                }
-
-
-
-            }
-
-            return results.ToArray();
-            */
+            return results.ToArray();           
         }
 
     }

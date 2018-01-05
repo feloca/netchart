@@ -220,6 +220,15 @@
     <Content Include="Views\Test\TestPie.cshtml" />
     <Content Include="Views\Test\TestRadar.cshtml" />
     <Content Include="Views\Test\TestTemperature.cshtml" />
+    <Content Include="Views\Test\TestArea3D.cshtml" />
+    <Content Include="Views\Test\TestWaterfall.cshtml" />
+    <Content Include="Views\Test\TestAttachedColumnPercentage.cshtml" />
+    <Content Include="Views\Test\TestAttachedColumn.cshtml" />
+    <Content Include="Views\Test\TestMultipleBar.cshtml" />
+    <Content Include="Views\Test\TestMultipleLine.cshtml" />
+    <Content Include="Views\Test\TestMultipleColumn.cshtml" />
+    <Content Include="Views\Test\TestOverlapArea.cshtml" />
+    <Content Include="Views\Test\TestOverlapAreaPercentage.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="App_Data\" />

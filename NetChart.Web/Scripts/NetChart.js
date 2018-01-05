@@ -508,17 +508,18 @@
             minZVariable = 0;
         }//todo: lo mismo que con variable, hay que mirar los margenes
 
-        let chartZMax = chartHeight / 8; //hago que el tamaño de la burbuja sea como maximo el 25% de la altura (OJO que esto es el radio)
+        let chartZMaxRadio = chartHeight / (8 * 2); //hago que el tamaño de la burbuja proporcional a la altura (OJO que esto es el radio)
+        let chartZMinRadio = chartZMaxRadio / (12 * 2);
 
         let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
         let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
-        let scaleZ = nc_createScaleLinear(0, chartZMax, minZVariable, maxZVariable);
+        let scaleZ = nc_createScaleLinear(0, chartZMaxRadio, minZVariable, maxZVariable);
 
         //creo que hace falta la escala z, ¿pensar en el dominio?
         for (let i = 0; i < series.VariableData.length; ++i) {
             let x = scaleX.getDomainValue(series.DimensionData[i]);
             let y = scaleY.getDomainValue(series.VariableData[i]);
-            let r = scaleZ.getDomainValue(series.ZVariableData[i]);
+            let r = scaleZ.getDomainValue(series.ZVariableData[i]) + chartZMinRadio;
             nc_createCircle(svgChart, x, chartHeight - y, r, 'teal');
         }
 
@@ -567,7 +568,7 @@
             minVariable = 0;
         }//todo: lo mismo que con variable, hay que mirar los margenes
 
-        let scaleVar = nc_createScaleLinear(0, 1, minZVariable, maxZVariable);
+        let scaleVar = nc_createScaleLinear(0, 1, minVariable, maxVariable);
 
         for (let i = 0; i < data.Series.length; ++i) {
             let series = data.Series[i];
@@ -756,12 +757,17 @@
         //creo el titulo
         let title = nc_createText(parentSVG, '50%', 20, data.Display.Title);
         nc_appendAttribute(title, 'text-anchor', 'middle');
-        nc_appendAttribute(title, 'font-weight', 'bold');        
+        nc_appendAttribute(title, 'font-weight', 'bold');
 
         //si es un grafico que no necesita ejes devolvemos el marco limpio
         if (nc_types[data.ChartType] == 'Pie' || nc_types[data.ChartType] == 'Radar') {
             return svgChart;
         }
+
+        //TODO: esto hay que cambiarlo, algunos graficos como el de temperatura no pueden tener ejes genericos
+        //if (nc_types[data.ChartType] == 'Temperature') {
+        //    return svgChart;
+        //}
 
         let maxYRange = Number.MIN_SAFE_INTEGER;
         let minYRange = Number.MAX_SAFE_INTEGER;
@@ -784,15 +790,30 @@
         let leftAxisGap = 40;
         let bottomAxisGap = 15;
 
-        //el eje y siempre tiene numeros, el eje x puede tener cadenas (pasos) o numeros
-        nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
-        let scaleY = nc_createScaleLinear(0, chartHeight, minYRange, maxYRange);
-        let verticalMarks = 4; //100, 75, 50, 25, 0
-        let verticalGap = (maxYRange - minYRange) / verticalMarks;
-        for (let i = 0; i < verticalMarks + 1; ++i) {
-            nc_createText(parentSVG, chartX - leftAxisGap,
-                chartHeight - scaleY.getDomainValue(minYRange + (i * verticalGap)) + chartY,
-                (minYRange + (i * verticalGap)));
+        switch (nc_types[data.ChartType]) {
+            case 'Temperature':
+                nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
+                //alto, entre series
+                //en medio meter el nombre de la serie
+
+                let rowHeight = (chartHeight - chartY) / data.SeriesDimensions.length;
+                let rowCenter = rowHeight / 2;
+                for (let i = 0; i < data.SeriesDimensions.length; ++i) {
+                    nc_createText(parentSVG, chartX - leftAxisGap, (i * rowHeight) + rowCenter + chartY + bottomAxisGap, data.SeriesDimensions[i]);
+                }
+                break;
+            default:
+                //el eje y siempre tiene numeros, el eje x puede tener cadenas (pasos) o numeros  
+                nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
+                let scaleY = nc_createScaleLinear(0, chartHeight, minYRange, maxYRange);
+                let verticalMarks = 4; //100, 75, 50, 25, 0
+                let verticalGap = (maxYRange - minYRange) / verticalMarks;
+                for (let i = 0; i < verticalMarks + 1; ++i) {
+                    nc_createText(parentSVG, chartX - leftAxisGap,
+                        chartHeight - scaleY.getDomainValue(minYRange + (i * verticalGap)) + chartY,
+                        (minYRange + (i * verticalGap)));
+                }
+                break;
         }
 
         //el eje x puede tener numeros y cadenas asi como pasos o evolucion lineal
@@ -801,20 +822,48 @@
         nc_createLine(parentSVG, chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight, 'black');
         if (data.SeriesDimensions != null) {
             //si tenemos los valores de la dimension definidos los usamos
-            //el primer caso es que sean textos
+            //el primer caso es que sean textos            
             if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
-                let columnWidth = (chartWidth - chartX) / data.SeriesDimensions.length;
+                //todo: el codigo dentro de este if esta mal, hay que revisar todas las series y quedarse con todos los valores distintos de dimension
+                //y ordenarlos
+                let dimensionValues = [];                
+                for (let i = 0; i < data.Series.length; ++i) {
+                    let series = data.Series[i];
+                    for (let j = 0; j < series.length; ++j) {
+                        if (dimensionValues.indexOf(series.DimensionData[j] == -1)) {
+                            dimensionValues.push(series.DimensionData[j]);
+                        }
+                    }
+                }
+                dimensionValues = dimensionValues.sort();
+
+                let columnWidth = (chartWidth - chartX) / dimensionValues.length;
                 let columnCenter = columnWidth / 2;
-                for (let i = 0; i < data.SeriesDimensions.length; ++i) {
-                    nc_createText(parentSVG, (i * columnWidth) + columnCenter + chartX, chartY + chartHeight + bottomAxisGap, data.SeriesDimensions[i]);
+                for (let i = 0; i < dimensionValues.length; ++i) {
+                    nc_createText(parentSVG, (i * columnWidth) + columnCenter + chartX, chartY + chartHeight + bottomAxisGap, dimensionValues[i]);
                 }
             } else {
                 //el segundo caso es que sean numeros
-                maxXRange = nc_maxValue(data.SeriesDimesions);
-                minXRange = nc_minValue(data.SeriesDimesions);
+                //sacar el maximo y el minimo de todas las series
+                //todo: este else esta sin probar
+                for (let i = 0; i < data.Series.length; ++i) {
+                    let series = data.Series[i];
+                    let maxSeries = nc_maxValue(series.DimensionData);
+                    let minSeries = nc_minValue(series.DimensionData);
+                    if (maxSeries > maxXRange) {
+                        maxXRange = maxSeries;
+                    }
+                    if (minSeries < minXRange) {
+                        minXRange = minSeries;
+                    }
+                }
+
                 let scaleX = nc_createScaleLinear(0, chartWidth - chartX, minXRange, maxXRange);
-                for (let i = 0; i < data.SeriesDimesions.length; ++i) {
-                    nc_createText(parentSVG, scaleX.getDomainValue(data.SeriesDimensions[i]) + chartX, chartY + chartHeight + bottomAxisGap, data.SeriesDimensions[i]);
+                for (let i = 0; i < data.Series.length; ++i) {
+                    let series = data.Series[i];
+                    for (let j = 0; j < series.DimensionData.length; ++j) {
+                        nc_createText(parentSVG, scaleX.getDomainValue(series.DimensionData[i]) + chartX, chartY + chartHeight + bottomAxisGap, series.DimensionData[i]);
+                    }
                 }
             }
         } else {

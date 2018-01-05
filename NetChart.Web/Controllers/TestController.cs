@@ -11,7 +11,7 @@ using System.Web.Mvc;
 namespace NetChart.Web.Controllers
 {
     public class TestController : Controller
-    {       
+    {
         // GET: Test
         public ActionResult Index()
         {
@@ -51,13 +51,57 @@ namespace NetChart.Web.Controllers
                 {
                     Description = "Test gráfico de tarta",
                     Method =  "TestPie"
-                }, 
+                },
                 new TestVM()
                 {
                     Description = "Test gráfico de radar",
                     Method = "TestRadar"
+                },
+                new TestVM()
+                {
+                    Description = "Test gráfico de area 3d",
+                    Method = "TestArea3D"
+                },
+                new TestVM()
+                {
+                    Description = "Test gráfico de cascada",
+                    Method = "TestWaterfall"
+                },
+                new TestVM()
+                {
+                    Description = "Test gráfico de columnas adosadas con %",
+                    Method = "TestAttachedColumnPercentage"
+                },
+                new TestVM()
+                {
+                    Description = "Test gráfico de columnas adosadas",
+                    Method = "TestAttachedColumn"
+                },
+                new TestVM()
+                {
+                    Description = "Test gráfico de areas adosadas con %",
+                    Method = "TestOverlapAreaPercentage"
+                },        
+                new TestVM()
+                {
+                    Description = "Test gráfico de areas adosadas",
+                    Method = "TestOverlapArea"
+                },
+                new TestVM()
+                {
+                    Description = "Test gráfico de multiples columnas",
+                    Method = "TestMultipleColumn"
+                },        
+                new TestVM()
+                {
+                    Description = "Test gráfico de multiples líneas",
+                    Method = "TestMultipleLine"
+                },        
+                new TestVM()
+                {
+                    Description = "Test gráfico de multiples barras",
+                    Method = "TestMultipleBar"
                 }
-
                 });
             return View(testList);
         }
@@ -75,9 +119,9 @@ namespace NetChart.Web.Controllers
             //Asignamos colección de datos
             chart.Data = data;
             //Asignarmos el tipo elegido
-            chart.ChartType = ChartTypeEnum.Histogram;            
+            chart.ChartType = ChartTypeEnum.Histogram;
             //Si quisiéramos recomendaciones indicamos modo depuración
-            if(tipo != null)
+            if (tipo != null)
             {
                 chart.ChartType = ChartTypeEnum.Debug;
             }
@@ -135,15 +179,15 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
 
-            chart.VariablePropertyName = "Altura";            
+            chart.VariablePropertyName = "Altura";
             chart.DimensionPropertyName = "Edad";
             chart.ZVariablePropertyName = "Peso";
-            
+
             //ordenamos la salida
             chart.OrderDimensionProperty = OrderTypeEnum.Ascending;
             chart.Title = "Peso por altura/edad";
             ViewBag.nc_data = chart.Generate();
-            return View(data);           
+            return View(data);
         }
 
         public ActionResult TestTemperature(int? tipo)
@@ -177,8 +221,9 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
             chart.VariablePropertyName = "Altura";
-            //chart.VariableProperty.Aggregation;
-            chart.DimensionPropertyName = "Nacionalidad";
+            chart.VariableProperty.Aggregation = AggregateEnum.Average;
+            chart.SeriePropertyName = "Nacionalidad";
+            chart.Title = "Media de edad por nacionalidades";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -196,6 +241,153 @@ namespace NetChart.Web.Controllers
             chart.VariablePropertyName = "Altura";
             //chart.VariableProperty.Aggregation;
             chart.DimensionPropertyName = "Nacionalidad";
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestArea3D(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Area3D;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestWaterfall(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.Waterfall;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestAttachedColumnPercentage(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.AttachedColumnPercentage;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestAttachedColumn(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.AttachedColumn;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestOverlapAreaPercentage(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.OverlapAreaPercentage;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestOverlapArea(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.OverlapArea;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestMultipleColumn(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.MultipleColumn;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestMultipleLine(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.MultipleLine;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+            chart.Title = "";
+            ViewBag.nc_data = chart.Generate();
+            return View(data);
+        }
+
+        public ActionResult TestMultipleBar(int? tipo)
+        {
+            var data = Generator.GenerarPersonas(10);
+            var chart = new Chart<Persona>();
+            chart.Data = data;
+            chart.ChartType = ChartTypeEnum.MultipleBar;
+            if (tipo != null)
+            {
+                chart.ChartType = ChartTypeEnum.Debug;
+            }
+
+            chart.Title = "";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }

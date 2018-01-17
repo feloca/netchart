@@ -53,6 +53,7 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="App.config" />
+    <None Include="Prueba.cd" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\NetChart\NetChart.csproj">

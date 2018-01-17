@@ -18,10 +18,10 @@ namespace NetChart.Web.Controllers
             var testList = new List<TestVM>();
 
             testList.AddRange(new[] {
-                new TestVM() {
-                    Description = "Pruebas de concepto",
-                    Method = "desa"
-                },
+                //new TestVM() {
+                //    Description = "Pruebas de concepto",
+                //    Method = "desa"
+                //},
                 new TestVM()
                 {
                     Description = "Test gráfico histograma",
@@ -239,9 +239,9 @@ namespace NetChart.Web.Controllers
                 chart.ChartType = ChartTypeEnum.Debug;
             }
             chart.VariablePropertyName = "Altura";
-            //chart.VariableProperty.Aggregation;
+            chart.VariableProperty.Aggregation = AggregateEnum.Average;
             chart.DimensionPropertyName = "Nacionalidad";
-            chart.Title = "";
+            chart.Title = "Altura media por nacionalidad";
             ViewBag.nc_data = chart.Generate();
             return View(data);
         }
@@ -259,7 +259,8 @@ namespace NetChart.Web.Controllers
 
             chart.VariablePropertyName = "Tension";
             chart.DimensionPropertyName = "Estudios";
-            chart.ZVariablePropertyName = "Edad";            
+            chart.ZVariablePropertyName = "Edad";
+            chart.OrderDimensionProperty = OrderTypeEnum.Ascending;
 
             chart.Title = "Tension según nivel de estudios por edades";
             ViewBag.nc_data = chart.Generate();
@@ -278,8 +279,6 @@ namespace NetChart.Web.Controllers
             }
 
             chart.VariablePropertyName = "Peso";
-            //chart.DimensionPropertyName = "Estudios";
-            //chart.ZVariablePropertyName = "Edad";
 
             chart.Title = "Evolución pesos de la población";
             ViewBag.nc_data = chart.Generate();

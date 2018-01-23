@@ -19,7 +19,12 @@
     var nc_selection = null;
 
     //Estos valores deben corresponderse con el enumerado ChartTypeEnum
-    const nc_types = ['Debug', 'Bar', 'Line', 'Scatter', 'Bubble', 'Temperature', 'Pie', 'Radar'];
+    const nc_types = ['Debug', 'Histogram', 'Line', 'Scatter', 'Bubble', 'Temperature', 'Pie', 'Radar', 'Area3D',
+        'Waterfall', 'AttachedColumnPercentage', 'AttachedColumn', 'OverlapAreaPercentage', 'OverlapArea',
+        'MultipleColumn', 'MultipleLine', 'MultipleBar'];
+
+    //Estos valores deben corresponderse con el enumerado VariableTypeEnum
+    const nc_displayTypes = ['Discrete', 'Continuous', 'Nominal', 'Ordinal'];
 
     //Paleta de colores por defecto -> 14
     const nc_colors = ['navy', 'blue', 'aqua', 'teal', 'olive', 'green', 'lime', 'yellow', 'orange', 'red', 'maroon', 'fuchsia', 'purple', 'gray'];
@@ -45,25 +50,34 @@
             nc_selection = selector;
         }
 
-        return nc;//probar esto
+        return nc;
     }
 
-    //funcion que reciba el JSON 
+    //funcion que dibuja el grafico JS, reciba el JSON con los datos
     nc.draw = function (dataStr) {
+        //como decodificar caracteres de escape de html
+        //https://stackoverflow.com/questions/7394748/whats-the-right-way-to-decode-a-string-that-has-special-html-entities-in-it
+
         console.log('fn draw');
         var dataObj = JSON.parse(dataStr);
         //data_obj.ChartType;
         //data_obj.Suggestions; //[]
-        //data_obj.VariableData; //[] -> la y -> ESTA ES LA PROPIEDAD PRINCIPAL, A TOMAR DE REFERENCIA EN TODOS LOS GRÁFICOS
-        //data_obj.DimensionData; //[] -> la x
-        //data_obj.ZVariableData; //[]
+        //data_obj.SeriesDimensions; //[] -> cuando la serie esta difinida segun el caso es posible contar con las dimensiones
+        //data_obj.Series[0].Descriptor;
+        //data_obj.Series[0].VariableData; //[] -> la y -> ESTA ES LA PROPIEDAD PRINCIPAL, A TOMAR DE REFERENCIA EN TODOS LOS GRÁFICOS
+        //data_obj.Series[0].DimensionData; //[] -> la x
+        //data_obj.Series[0].ZVariableData; //[]
+        //data_obj.Display.Title; -> titulo del grafico
+        //data_obj.Display.VariableDisplayType; -> tipo de dato visual y
+        //data_obj.Display.DimensionDisplayType; -> tipo de dato visual x
+        //data_obj.Display.ZVariableDisplayType; -> tipo de dato visual z
 
         switch (nc_types[dataObj.ChartType]) {
             case 'Debug':
                 nc_drawChartDebug(dataObj);
                 break;
-            case 'Bar':
-                nc_drawChartBar(dataObj);
+            case 'Histogram':
+                nc_drawChartHistogram(dataObj);
                 break;
             case 'Line':
                 nc_drawChartLine(dataObj);
@@ -83,7 +97,35 @@
             case 'Radar':
                 nc_drawChartRadar(dataObj);
                 break;
+            case 'Area3D':
+                nc_drawChartNotImplemented(dataObj);
+                break;
+            case 'Waterfall':
+                nc_drawChartNotImplemented(dataObj);
+                break;
+            case 'AttachedColumnPercentage':
+                nc_drawChartNotImplemented(dataObj);
+                break;
+            case 'AttachedColumn':
+                nc_drawChartNotImplemented(dataObj);
+                break;
+            case 'OverlapAreaPercentage':
+                nc_drawChartNotImplemented(dataObj);
+                break;
+            case 'OverlapArea':
+                nc_drawChartNotImplemented(dataObj);
+                break;
+            case 'MultipleColumn':
+                nc_drawChartNotImplemented(dataObj);
+                break;
+            case 'MultipleLine':
+                nc_drawChartNotImplemented(dataObj);
+                break;
+            case 'MultipleBar':
+                nc_drawChartNotImplemented(dataObj);
+                break;
             default:
+                console.log('fn draw: no se ha encontrado el tipo ' + dataObj.ChartType);
                 break;
         }
     }
@@ -93,32 +135,140 @@
         //alert('no va mal ' + combo.value);
         console.log('fn debugSelection');
         console.log(dataStr);
+        var chartInfo = nc_document.getElementsByClassName('nc_chart_info')[0];
         var dataObj = dataStr;//JSON.parse(dataStr);
         switch (nc_types[combo.value]) {
             case 'Debug':
-                //Aqui hay que repetir la información de ayuda
-                nc_selection.innerHTML = '';
+                nc_selection.innerHTML = nc_debugInformation(dataObj);
+                chartInfo.innerHTML = '';
                 break;
-            case 'Bar':
-                nc_drawChartBar(dataObj);
+            case 'Histogram':
+                nc_drawChartHistogram(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Comparison</li>' +
+                                    '<li>Distribution</li>' +
+                                    '<li>Composition</li>' +
+                                    '</ul>';
+
+                //'El grafico de barras permite representar: comparacion, distribucion y composicion';
                 break;
             case 'Line':
                 nc_drawChartLine(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Comparison</li>' +
+                                    '<li>Distribution</li>' +
+                                    '<li>Composition</li>' +
+                                    '</ul>';
+
+                //'El grafico de lineas permite representar: comparacion, distribucion y composicion';
                 break;
             case 'Scatter':
                 nc_drawChartScatter(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Distribution</li>' +
+                                    '<li>Relationship</li>' +
+                                    '</ul>';
+
+                //'El grafico de dispersion permite representar: distribucion y relacion';
                 break;
             case 'Bubble':
                 nc_drawChartBubble(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Relationship</li>' +
+                                    '</ul>';
+
+                //'El grafico de burbujas permite representar: relacion';
                 break;
             case 'Temperature':
                 nc_drawChartTemperature(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Comparison</li>' +
+                                    '</ul>';
+                //'El grafico de temperatura permite representar: ';
                 break;
             case 'Pie':
                 nc_drawChartPie(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Composition</li>' +
+                                    '</ul>';
+                //'El frafico de tarta permite representar: composicion';
                 break;
             case 'Radar':
                 nc_drawChartRadar(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                                    '<ul>' +
+                                    '<li>Comparison</li>' +
+                                    '</ul>';
+                //'El grafico de radar permite representar: comparacion';
+                break;
+            case 'Area3D':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Distribution</li>' +
+                    '</ul>';
+                break;
+            case 'Waterfall':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Composition</li>' +
+                    '</ul>';
+                break;
+            case 'AttachedColumnPercentage':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Composition</li>' +
+                    '</ul>';
+                break;
+            case 'AttachedColumn':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Composition</li>' +
+                    '</ul>';
+                break;
+            case 'OverlapAreaPercentage':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Composition</li>' +
+                    '</ul>';
+                break;
+            case 'OverlapArea':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Composition</li>' +
+                    '</ul>';
+                break;
+            case 'MultipleColumn':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Comparison</li>' +
+                    '</ul>';
+                break;
+            case 'MultipleLine':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Comparison</li>' +
+                    '</ul>';
+                break;
+            case 'MultipleBar':
+                nc_drawChartNotImplemented(dataObj);
+                chartInfo.innerHTML = 'Good for:' +
+                    '<ul>' +
+                    '<li>Comparison</li>' +
+                    '</ul>';
                 break;
             default:
                 break;
@@ -140,28 +290,13 @@
                     '<h4><strong>NetChart</strong></h4>' +
                     '<br/>' +
                     '<div>' +
-                    '<label>Suggestion: </label>' +
+                    '<label>Suggestions: </label>' +
                     '<select onchange=\'nc.debugSelection(this, ' + JSON.stringify(data) + ');\'>' + options +
 			        '</select>' +
                     '</div>' +
                     '<br/>' +
-                    '<h4>Current configuration</h4>' +
-                    '<fieldset>' +
-                    //'    <legend>Current configuration</legend>' +
-                    '<div> ' +
-                    '        <label>Variable: </label>' +
-                    '        Nominal - SUM                ' +
-                    '</div>' +
-                    '<div>' +
-                    '    <label>Dimension: </label>' +
-                    '    Discrete                ' +
-                    '</div>' +
-                    '<div>' +
-                    '    <label>ZVariable: </label>' +
-                    '    No defined  ' +
-                    '</div>' +
-                    '</fieldset>';
-
+                    '<h4>Chart description</h4>' +
+                    '<div class="nc_chart_info"></div>';
 
         //padding:.5em; NO FUNCIONA, los estilos en svg se asignan distinto de los ELEMENT, lo pongo como atributo
         //nc_appendStyleAttribute(divControl, "padding", "2em;"); 
@@ -172,15 +307,55 @@
 
         let divChart = nc_document.createElement('div');
         nc_appendAttribute(divChart, "style", "width:" + (nc_selection.clientWidth - divControl.clientWidth - 5) + "px;height:100%;float:right;");
-        divChart.innerHTML = '<p>Aqui hay que poner una nota informativa</p>'
+        divChart.innerHTML = nc_debugInformation(data);//'<p>Aqui hay que poner una nota informativa</p>';
         nc_selection.appendChild(divChart);
 
         //ahora dibujo los gráficos en un subespacio.
         nc_selection = divChart;
     }
 
+    //Esta función muestra la información de la pantalla de entrada
+    function nc_debugInformation(data) {
+        let result =
+            '<h4>Please, select a suggestion</h4>' +
+            '<br/>' +
+            '<h4>Current configuration</h4>' +
+            '<fieldset>' +
+            //'    <legend>Current configuration</legend>' +
+            '<div> ' +
+            '        <label>Variable: </label>' +
+            data.VariableInfo +
+            '</div>' +
+            '<div>' +
+            '    <label>Dimension: </label>' +
+            data.DimensionInfo +
+            '</div>' +
+            '<div>' +
+            '    <label>ZVariable: </label>' +
+            data.ZVariableInfo +
+            '</div>' +
+            '</fieldset>';
+
+        return result;
+    }
+
+    //Esta funcion muestra un mensaje generico cuando un tipo de grafico no esta implementado todavía, borrar cuando este completo
+    function nc_drawChartNotImplemented(data) {
+        //let svgRoot = nc_getSVGRoot();        
+        let result =
+            '<h4>Selected graph is not implemented</h4>' +
+            '<br/>' +
+            '<div> ' +
+            '        <label>Chart type: </label>' +
+            nc_types[data.ChartType] +
+            '</div>';
+
+        nc_selection.innerHTML = result;
+        //nc_selection.appendChild(svgRoot);
+    }
+
     //Esta función dibuja un gráfico de barras vertical
-    function nc_drawChartBar(data) {
+    function nc_drawChartHistogram(data) {
         let svgRoot = nc_getSVGRoot();
         let svgRootWidth = nc_selection.clientWidth;
         let svgRootHeight = nc_selection.clientHeight;
@@ -193,28 +368,27 @@
         //meter el grafico en un "g" y transladarlo, o crear SVG nuevo para el gráfico
         //el problema de g es que no recorta lo que queda afuera de sus dimensiones
 
-        //aqui me he quedado, creo que esta funcion podria poner el titulo y los ejes
-        //function nc_createSVGChart(svgRoot, svgRootWidth, svgRootHeight, y data)
         let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
         let chartWidth = svgChart.width.baseVal.value
         let chartHeight = svgChart.height.baseVal.value;
-        //alert(chartHeight);
+        //este grafico no admite series
+        let serie = data.Series[0];
 
         //let svgChart = nc_createSVG(svgRoot, chartX, chartY, chartWidth, chartHeight);
-        let maxVariable = nc_maxValue(data.VariableData);
-        let minVariable = nc_minValue(data.VariableData);
+        let maxVariable = nc_maxValue(serie.VariableData);
+        let minVariable = nc_minValue(serie.VariableData);
         if (minVariable > 0) {
             minVariable = 0;
         }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
 
         let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable)
         //let columnCount = data.VariableData.length;
-        let columnWidth = chartWidth / data.VariableData.length;
+        let columnWidth = chartWidth / serie.VariableData.length;
 
-        for (let i = 0; i < data.VariableData.length; ++i) {
+        for (let i = 0; i < serie.VariableData.length; ++i) {
             //let dDimension = data.DimensionData[i];
             //todo: falta meter la escala a x
-            let dVariable = scaleY.getDomainValue(data.VariableData[i]);
+            let dVariable = scaleY.getDomainValue(serie.VariableData[i]);
             nc_createRect(svgChart, i * columnWidth, chartHeight - dVariable, columnWidth, dVariable, 'teal');
         }
 
@@ -231,15 +405,17 @@
         let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
         let chartWidth = svgChart.width.baseVal.value
         let chartHeight = svgChart.height.baseVal.value;
+        //este grafico no admite series
+        let serie = data.Series[0];
 
-        let maxVariable = nc_maxValue(data.VariableData);
-        let minVariable = nc_minValue(data.VariableData);
+        let maxVariable = nc_maxValue(serie.VariableData);
+        let minVariable = nc_minValue(serie.VariableData);
         if (minVariable > 0) {
             minVariable = 0;
         }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
 
-        let maxDimension = nc_maxValue(data.DimensionData);
-        let minDimension = nc_minValue(data.DimensionData);
+        let maxDimension = nc_maxValue(serie.DimensionData);
+        let minDimension = nc_minValue(serie.DimensionData);
 
         let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
         let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
@@ -247,11 +423,11 @@
         //se usa variable y dimension
         //todo: ¿gestionar un unico dato?, de momento solo 2 o mas, meter un if y pintar un punto o un recta de extremo a extremo
         //aqui va el bucle de lineas
-        for (let i = 1; i < data.VariableData.length; ++i) {
-            let x1 = scaleX.getDomainValue(data.DimensionData[i - 1]);
-            let y1 = scaleY.getDomainValue(data.VariableData[i - 1]);
-            let x2 = scaleX.getDomainValue(data.DimensionData[i]);
-            let y2 = scaleY.getDomainValue(data.VariableData[i]);
+        for (let i = 1; i < serie.VariableData.length; ++i) {
+            let x1 = scaleX.getDomainValue(serie.DimensionData[i - 1]);
+            let y1 = scaleY.getDomainValue(serie.VariableData[i - 1]);
+            let x2 = scaleX.getDomainValue(serie.DimensionData[i]);
+            let y2 = scaleY.getDomainValue(serie.VariableData[i]);
             nc_createLine(svgChart, x1, chartHeight - y1, x2, chartHeight - y2, 'teal');
         }
 
@@ -267,25 +443,38 @@
         let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
         let chartWidth = svgChart.width.baseVal.value
         let chartHeight = svgChart.height.baseVal.value;
+        //este grafico no admite series
+        let series = data.Series[0];
 
-        let maxVariable = nc_maxValue(data.VariableData);
-        let minVariable = nc_minValue(data.VariableData);
+        let maxVariable = nc_maxValue(series.VariableData);
+        let minVariable = nc_minValue(series.VariableData);
         if (minVariable > 0) {
             minVariable = 0;
         }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
 
-        let maxDimension = nc_maxValue(data.DimensionData);
-        let minDimension = nc_minValue(data.DimensionData);
+        let maxDimension = nc_maxValue(series.DimensionData);
+        let minDimension = nc_minValue(series.DimensionData);
 
-        let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
         let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
 
-        //aquí van los puntos
-        for (let i = 0; i < data.VariableData.length; ++i) {
-            let x = scaleX.getDomainValue(data.DimensionData[i]);
-            let y = scaleY.getDomainValue(data.VariableData[i]);
+        //Creo que nunca va a ser nominal, deberia entrar numeros u ordinal. 
+        if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
+            let columnWidth = chartWidth / series.DimensionData.length;
+            let columnCenter = columnWidth / 2;
+            for (let i = 0; i < series.VariableData.length; ++i) {
+                let x = (i * columnWidth) + columnCenter;
+                let y = scaleY.getDomainValue(series.VariableData[i]);
+                nc_createCircle(svgChart, x, chartHeight - y, 5, 'teal');
+            }
+        } else {
+            let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
+            //aquí van los puntos
+            for (let i = 0; i < series.VariableData.length; ++i) {
+                let x = scaleX.getDomainValue(series.DimensionData[i]);
+                let y = scaleY.getDomainValue(series.VariableData[i]);
 
-            nc_createCircle(svgChart, x, chartHeight - y, 5, 'teal');
+                nc_createCircle(svgChart, x, chartHeight - y, 5, 'teal');
+            }
         }
 
         nc_selection.innerHTML = '';
@@ -300,33 +489,36 @@
         let svgChart = nc_createSVGChartLayout(svgRoot, svgRootWidth, svgRootHeight, data);
         let chartWidth = svgChart.width.baseVal.value
         let chartHeight = svgChart.height.baseVal.value;
+        //este grafico no admite series
+        let series = data.Series[0];
 
-        let maxVariable = nc_maxValue(data.VariableData);
-        let minVariable = nc_minValue(data.VariableData);
+        let maxVariable = nc_maxValue(series.VariableData);
+        let minVariable = nc_minValue(series.VariableData);
         if (minVariable > 0) {
             minVariable = 0;
         }//todo: si el rango inferior es negativo restarle un 5% (max-min*0.05) para que aparezca el valor minimo
 
-        let maxDimension = nc_maxValue(data.DimensionData);
-        let minDimension = nc_minValue(data.DimensionData);
+        let maxDimension = nc_maxValue(series.DimensionData);
+        let minDimension = nc_minValue(series.DimensionData);
 
-        let maxZVariable = nc_maxValue(data.ZVariableData);
-        let minZVariable = nc_minValue(data.ZVariableData);
+        let maxZVariable = nc_maxValue(series.ZVariableData);
+        let minZVariable = nc_minValue(series.ZVariableData);
         if (minZVariable > 0) {
             minZVariable = 0;
         }//todo: lo mismo que con variable, hay que mirar los margenes
 
-        let chartZMax = chartHeight / 8; //hago que el tamaño de la burbuja sea como maximo el 25% de la altura (OJO que esto es el radio)
+        let chartZMaxRadio = chartHeight / (8 * 2); //hago que el tamaño de la burbuja proporcional a la altura (OJO que esto es el radio)
+        let chartZMinRadio = chartZMaxRadio / (12 * 2);
 
         let scaleX = nc_createScaleLinear(0, chartWidth, minDimension, maxDimension);
         let scaleY = nc_createScaleLinear(0, chartHeight, minVariable, maxVariable);
-        let scaleZ = nc_createScaleLinear(0, chartZMax, minZVariable, maxZVariable);
+        let scaleZ = nc_createScaleLinear(0, chartZMaxRadio, minZVariable, maxZVariable);
 
         //creo que hace falta la escala z, ¿pensar en el dominio?
-        for (let i = 0; i < data.VariableData.length; ++i) {
-            let x = scaleX.getDomainValue(data.DimensionData[i]);
-            let y = scaleY.getDomainValue(data.VariableData[i]);
-            let r = scaleZ.getDomainValue(data.ZVariableData[i]);
+        for (let i = 0; i < series.VariableData.length; ++i) {
+            let x = scaleX.getDomainValue(series.DimensionData[i]);
+            let y = scaleY.getDomainValue(series.VariableData[i]);
+            let r = scaleZ.getDomainValue(series.ZVariableData[i]) + chartZMinRadio;
             nc_createCircle(svgChart, x, chartHeight - y, r, 'teal');
         }
 
@@ -343,34 +535,56 @@
         let chartWidth = svgChart.width.baseVal.value
         let chartHeight = svgChart.height.baseVal.value;
 
-        let dimesionSteps = nc_distinct(nc_sort(data.DimensionData));
-        let variableSteps = nc_distinct(data.VariableData);
+        let dimesionSteps = data.SeriesDimensions; //nc_distinct(nc_sort(data.DimensionData));
+        //let variableSteps = [];//nc_distinct(data.VariableData);
 
-        let maxZVariable = nc_maxValue(data.ZVariableData);
-        let minZVariable = nc_minValue(data.ZVariableData);
-        if (minZVariable > 0) {
-            minZVariable = 0;
-        }//todo: lo mismo que con variable, hay que mirar los margenes
+        let maxVariable = Number.MIN_SAFE_INTEGER; //nc_maxValue(data.ZVariableData);
+        let minVariable = Number.MAX_SAFE_INTEGER; //nc_minValue(data.ZVariableData);
 
-        let scaleZ = nc_createScaleLinear(0, 1, minZVariable, maxZVariable);
-
-        //sacar los elementos distintos sin repetidos
-        //crear un nc_arrayScaleArray -> crear un nc_shortDistinct o dos
-
-        let rowHeight = chartHeight / variableSteps.length;
+        let rowHeight = chartHeight / data.Series.length; //chartHeight / variableSteps.length;
         let columnWidth = chartWidth / dimesionSteps.length;
 
-        for (let i = 0; i < dimesionSteps.length; ++i) {
-            for (let j = 0; j < data.DimensionData.length; ++j) {
-                if (data.DimensionData[j] == dimesionSteps[i]) {
-                    //dibujar la y y la z
-                    let x = i;
-                    let y = variableSteps.indexOf(data.VariableData[j]);
-                    let z = scaleZ.getDomainValue(data.ZVariableData[j]); //opacity
+        //deberiamos de tener una UNICA fila en cada serie, a la hora de agrupar datos agruparlos
+        //este grafico funciona con series
+        //todo: POSIBLEMENTE este grafico no represente todas las casuisticas correctamente
 
-                    let rect = nc_createRect(svgChart, x * columnWidth, chartHeight - (y * rowHeight) - rowHeight,
-                        columnWidth, rowHeight, 'teal');
-                    nc_appendAttribute(rect, 'fill-opacity', z);
+        //calculo los maximos y minimos de referencia para Z
+        for (let i = 0; i < data.Series.length; ++i) {
+            let series = data.Series[i];
+
+            let maxSeries = nc_maxValue(series.VariableData);
+            let minSeries = nc_minValue(series.VariableData);
+
+            if (maxSeries > maxVariable) {
+                maxVariable = maxSeries;
+            }
+            if (minSeries < minVariable) {
+                minVariable = minSeries;
+            }
+        }
+
+        if (minVariable > 0) {
+            minVariable = 0;
+        }//todo: lo mismo que con variable, hay que mirar los margenes
+
+        let scaleVar = nc_createScaleLinear(0, 1, minVariable, maxVariable);
+
+        for (let i = 0; i < data.Series.length; ++i) {
+            let series = data.Series[i];
+            //cada fila de la serie tendra una dimension de distinto valor (no contemplo ahora mismo repetidos)
+            //todo: contemplar series con valores de dimension repetidos
+            for (let j = 0; j < dimesionSteps.length; ++j) {
+                for (let k = 0; k < series.DimensionData.length; ++k) {
+                    if (series.DimensionData[k] = dimesionSteps[j]) {
+                        //dibujar la y y la z
+                        let x = i;
+                        let y = dimesionSteps.indexOf(series.DimensionData[j]);
+                        let z = scaleVar.getDomainValue(series.VariableData[j]); //opacity
+
+                        let rect = nc_createRect(svgChart, x * columnWidth, chartHeight - (y * rowHeight) - rowHeight,
+                            columnWidth, rowHeight, 'teal');
+                        nc_appendAttribute(rect, 'fill-opacity', z);
+                    }
                 }
             }
         }
@@ -388,25 +602,33 @@
         let chartWidth = svgChart.width.baseVal.value
         let chartHeight = svgChart.height.baseVal.value;
 
-        //AQUI ME HE QUEDADO
         //https://stackoverflow.com/questions/32750613/svg-draw-a-circle-with-4-sectors
         //https://jbkflex.wordpress.com/2011/07/28/creating-a-svg-pie-chart-html5/
         //solo trabajo con variabledata
 
-        //todo: hay que sumar los valores en funcion de la dimension, es decir, si existe una dimensión repetida sumar sus valores
-
+        //este grafico admite series, una por cada porcion de la tarta
         //calculamos el monto total de los datos
         let totalData = 0;
-        for (let i = 0; i < data.VariableData.length; ++i) {
-            totalData = totalData + Math.abs(data.VariableData[i]);
+        for (let i = 0; i < data.Series.length; ++i) {
+            let series = data.Series[i];
+            for (let j = 0; j < series.VariableData.length; ++j) {
+                totalData = totalData + Math.abs(series.VariableData[j]);
+            }
         }
 
         //calculamos el angulo correspondiente a cada dato en función 
         let angles = [];
-        for (let i = 0; i < data.VariableData.length; ++i) {
+        //let labels = [];
+        for (let i = 0; i < data.Series.length; ++i) {
+            let series = data.Series[i];
+            let totalSeries = 0;
+            for (let j = 0; j < series.VariableData.length; ++j) {
+                totalSeries = totalSeries + Math.abs(series.VariableData[j]);
+            }
             //let angle = Math.ceil(360 * Math.abs(data.VariableData[i]) / totalData);
-            let angle = 360 * (Math.abs(data.VariableData[i]) / totalData);
+            let angle = 360 * (totalSeries / totalData);
             angles.push(angle);
+            //labels.push(series.Description);
         }
 
         //calcular el centro y el radio
@@ -431,6 +653,8 @@
             y2 = parseFloat(centerY + radius * Math.sin(Math.PI * endAngle / 180));
 
             nc_createPathSector(svgChart, centerX, centerY, radius, x1, y1, x2, y2, nc_nextColor());
+            //labels[i] ties la descripcion del sector
+            //nc_createText(svgChart, x1, y1, labels[i]);
         }
 
         nc_selection.innerHTML = '';
@@ -446,6 +670,9 @@
         let chartWidth = svgChart.width.baseVal.value
         let chartHeight = svgChart.height.baseVal.value;
 
+        //este grafico no admite series
+        let series = data.Series[0];
+
         //Aqui me quede, sacar el numero de x total, 
         //sacar el maximo de y, calcular las distintas porciones,
         //calcular la interseccion del radio sobre sobre la recta
@@ -453,9 +680,9 @@
         //calculamos el angulo correspondiente a cada dato en función 
         let angles = [];
         angles.push(0);
-        for (let i = 1; i < data.VariableData.length; ++i) {
+        for (let i = 1; i < series.VariableData.length; ++i) {
             //let angle = Math.ceil(360 * Math.abs(data.VariableData[i]) / totalData);
-            let angle = (360 / data.VariableData.length) * i;
+            let angle = (360 / series.VariableData.length) * i;
             angles.push(angle);
         }
 
@@ -469,8 +696,8 @@
             radius = centerX;
         }
 
-        let maxVariable = nc_maxValue(data.VariableData);
-        let minVariable = nc_minValue(data.VariableData);
+        let maxVariable = nc_maxValue(series.VariableData);
+        let minVariable = nc_minValue(series.VariableData);
         if (minVariable > 0) {
             minVariable = 0;
         }
@@ -484,13 +711,13 @@
 
         for (let i = 0; i < angles.length; ++i) {
             startAngle = angles[i];
-            startRadius = scaleY.getDomainValue(data.VariableData[i]);
+            startRadius = scaleY.getDomainValue(series.VariableData[i]);
             if (i < angles.length - 1) {
                 endAngle = angles[i + 1];
-                endRadius = scaleY.getDomainValue(data.VariableData[i + 1]);
+                endRadius = scaleY.getDomainValue(series.VariableData[i + 1]);
             } else {
                 endAngle = angles[0];
-                endRadius = scaleY.getDomainValue(data.VariableData[0]);
+                endRadius = scaleY.getDomainValue(series.VariableData[0]);
             }
 
             //Dibujamos los ejes
@@ -506,7 +733,7 @@
 
             nc_createLine(svgChart, x1, y1, x2, y2, 'teal');
 
-            nc_createText(svgChart, axisX, axisY, data.DimensionData[i]);
+            nc_createText(svgChart, axisX, axisY, series.DimensionData[i]);
         }
         // nc_createCircle(svgChart, centerX, centerY, 4, 'blue');
 
@@ -519,50 +746,148 @@
         //todo: cuando defina los parametros de configuración (titulo, leyenda,etc) meterlos aqui
         let chartX = 30,
             chartY = 30,
-            chartWidth = width - (chartX * 2),
+            chartWidth = width - (chartX * 3),
             chartHeight = height - (chartY * 2);
+
+        //todo: la siguiente linea tendria que depender del tipo de grafico, si no existen comentarios o ejes ajustar mejor
+        chartX = chartX * 2; //dejo 2 partes a la izquierda para usar una de ellas para los textos del eje y
         let svgChart = nc_createSVG(parentSVG, chartX, chartY, chartWidth, chartHeight);
 
-        //creamos el eje y
-        let maxRange = nc_maxValue(data.VariableData);
-        let minRange = nc_minValue(data.VariableData);
-        if (minRange > 0) {
-            minRange = 0;
-        }//todo: revisar si gestiono negativos
-
-        //434 y max, y coge 494
-        let scaleY = nc_createScaleLinear(0, chartHeight, minRange, maxRange)
-        nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
-        for (let i = 0; i < data.VariableData.length; ++i) {
-            nc_createText(parentSVG, chartX - 20,
-                chartHeight - scaleY.getDomainValue(data.VariableData[i]) + chartY,
-                data.VariableData[i]);
-        }
-
-        //creamos el eje x
-        nc_createLine(parentSVG, chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight, 'black');
-        let columnWidth = chartWidth / data.DimensionData.length;
-        let columnCenter = columnWidth / 2;
-        for (let i = 0; i < data.DimensionData.length; ++i) {
-            nc_createText(parentSVG, (i * columnWidth) + columnCenter, chartY + chartHeight + 15, data.DimensionData[i]);
-        }
-
         //creo el titulo
-        let title = nc_createText(parentSVG, '50%', 20, 'EL TITULO');
-        //alignment-baseline="middle" text-anchor="middle"
-        //nc_appendAttribute(title, 'alignment-baseline', 'middle');
+        let title = nc_createText(parentSVG, '50%', 20, data.Display.Title);
         nc_appendAttribute(title, 'text-anchor', 'middle');
         nc_appendAttribute(title, 'font-weight', 'bold');
 
+        //si es un grafico que no necesita ejes devolvemos el marco limpio
+        if (nc_types[data.ChartType] == 'Pie' || nc_types[data.ChartType] == 'Radar') {
+            return svgChart;
+        }
+
+        //TODO: esto hay que cambiarlo, algunos graficos como el de temperatura no pueden tener ejes genericos
+        //if (nc_types[data.ChartType] == 'Temperature') {
+        //    return svgChart;
+        //}
+
+        let maxYRange = Number.MIN_SAFE_INTEGER;
+        let minYRange = Number.MAX_SAFE_INTEGER;
+        for (let i = 0; i < data.Series.length; ++i) {
+            let series = data.Series[i];
+            let maxSerie = nc_maxValue(series.VariableData);
+            let minSerie = nc_minValue(series.VariableData);
+            if (maxSerie > maxYRange) {
+                maxYRange = maxSerie;
+            }
+            if (minSerie < minYRange) {
+                minYRange = minSerie;
+            }
+        }
+        if (minYRange > 0) {
+            minYRange = 0;
+        }//todo: revisar si gestiono negativos
+
+        //espacio reservado para el contenido del eje y y del eje x
+        let leftAxisGap = 40;
+        let bottomAxisGap = 15;
+
+        switch (nc_types[data.ChartType]) {
+            case 'Temperature':
+                nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
+                //alto, entre series
+                //en medio meter el nombre de la serie
+
+                let rowHeight = (chartHeight - chartY) / data.SeriesDimensions.length;
+                let rowCenter = rowHeight / 2;
+                for (let i = 0; i < data.SeriesDimensions.length; ++i) {
+                    nc_createText(parentSVG, chartX - leftAxisGap, (i * rowHeight) + rowCenter + chartY + bottomAxisGap, data.SeriesDimensions[i]);
+                }
+                break;
+            default:
+                //el eje y siempre tiene numeros, el eje x puede tener cadenas (pasos) o numeros  
+                nc_createLine(parentSVG, chartX, chartY, chartX, chartY + chartHeight, 'black');
+                let scaleY = nc_createScaleLinear(0, chartHeight, minYRange, maxYRange);
+                let verticalMarks = 4; //100, 75, 50, 25, 0
+                let verticalGap = (maxYRange - minYRange) / verticalMarks;
+                for (let i = 0; i < verticalMarks + 1; ++i) {
+                    nc_createText(parentSVG, chartX - leftAxisGap,
+                        chartHeight - scaleY.getDomainValue(minYRange + (i * verticalGap)) + chartY,
+                        (minYRange + (i * verticalGap)));
+                }
+                break;
+        }
+
+        //el eje x puede tener numeros y cadenas asi como pasos o evolucion lineal
+        let maxXRange = Number.MIN_SAFE_INTEGER;
+        let minXRange = Number.MAX_SAFE_INTEGER;
+        nc_createLine(parentSVG, chartX, chartY + chartHeight, chartX + chartWidth, chartY + chartHeight, 'black');
+        if (data.SeriesDimensions != null) {
+            //si tenemos los valores de la dimension definidos los usamos
+            //el primer caso es que sean textos            
+            if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
+                //todo: el codigo dentro de este if esta mal, hay que revisar todas las series y quedarse con todos los valores distintos de dimension
+                //y ordenarlos
+                let dimensionValues = [];
+                for (let i = 0; i < data.Series.length; ++i) {
+                    let series = data.Series[i];
+                    for (let j = 0; j < series.length; ++j) {
+                        if (dimensionValues.indexOf(series.DimensionData[j] == -1)) {
+                            dimensionValues.push(series.DimensionData[j]);
+                        }
+                    }
+                }
+                dimensionValues = dimensionValues.sort();
+
+                let columnWidth = (chartWidth - chartX) / dimensionValues.length;
+                let columnCenter = columnWidth / 2;
+                for (let i = 0; i < dimensionValues.length; ++i) {
+                    nc_createText(parentSVG, (i * columnWidth) + columnCenter + chartX, chartY + chartHeight + bottomAxisGap, dimensionValues[i]);
+                }
+            } else {
+                //el segundo caso es que sean numeros
+                //sacar el maximo y el minimo de todas las series
+                //todo: este else esta sin probar
+                for (let i = 0; i < data.Series.length; ++i) {
+                    let series = data.Series[i];
+                    let maxSeries = nc_maxValue(series.DimensionData);
+                    let minSeries = nc_minValue(series.DimensionData);
+                    if (maxSeries > maxXRange) {
+                        maxXRange = maxSeries;
+                    }
+                    if (minSeries < minXRange) {
+                        minXRange = minSeries;
+                    }
+                }
+
+                let scaleX = nc_createScaleLinear(0, chartWidth - chartX, minXRange, maxXRange);
+                for (let i = 0; i < data.Series.length; ++i) {
+                    let series = data.Series[i];
+                    for (let j = 0; j < series.DimensionData.length; ++j) {
+                        nc_createText(parentSVG, scaleX.getDomainValue(series.DimensionData[i]) + chartX, chartY + chartHeight + bottomAxisGap, series.DimensionData[i]);
+                    }
+                }
+            }
+        } else {
+            //por ultimo, si no esta definida los campos de la dimension tendremos que calcularlos
+            //aqui NO pueden existir varias series
+            let series = data.Series[0];
+            if (nc_displayTypes[data.Display.DimensionDisplayType] == 'Nominal' || nc_displayTypes[data.Display.DimensionDisplayType] == 'Ordinal') {
+                //let computedDimensions = //nc_distinct(series.DimensionData);
+                let columnWidth = (chartWidth - chartX) / series.DimensionData.length;
+                let columnCenter = columnWidth / 2;
+                for (let i = 0; i < series.DimensionData.length; ++i) {
+                    nc_createText(parentSVG, (i * columnWidth) + columnCenter + chartX, chartY + chartHeight + bottomAxisGap, series.DimensionData[i]);
+                }
+            } else {
+                maxXRange = nc_maxValue(series.DimensionData);
+                minXRange = nc_minValue(series.DimensionData);
+                let scaleX = nc_createScaleLinear(0, chartWidth - chartX, minXRange, maxXRange);
+                for (let i = 0; i < series.DimensionData.length; ++i) {
+                    nc_createText(parentSVG, scaleX.getDomainValue(series.DimensionData[i]) + chartX, chartY + chartHeight + bottomAxisGap, series.DimensionData[i]);
+                }
+            }
+        }
+
         return svgChart;
     }
-
-    //function nc_drawChartLine() { }
-    //function nc_drawChartScatter() { }
-    //function nc_drawChartBubble() { }
-    //function nc_drawChartTemperature() { }
-    //function nc_drawChartPie() { }
-    //function nc_drawChartRadar() { }
 
     //Añade un nodo hijo a un nodo
     //function nc_appendChild(parentNode, childNode) {
@@ -572,9 +897,11 @@
     //Añade un atributo a un nodo
     function nc_appendAttribute(node, attrName, attrValue) {
         //node.hasAttribute(attrName) //TODO: mirar esto
-        let attr = nc_document.createAttribute(attrName);
-        attr.value = attrValue;
-        node.setAttributeNode(attr);
+        //let attr = nc_document.createAttribute(attrName);
+        //attr.value = attrValue;
+        //node.setAttributeNode(attr);
+        //createAttribute no esta recomendado
+        node.setAttribute(attrName, attrValue);
     }
 
     //Añade un estilo a un nodo

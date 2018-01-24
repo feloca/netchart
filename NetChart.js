@@ -132,7 +132,6 @@
 
     //Esta función se encarga de redibujar los gráficos cuando el usuario selecciona una sugerencia
     nc.debugSelection = function (combo, dataStr) {
-        //alert('no va mal ' + combo.value);
         console.log('fn debugSelection');
         console.log(dataStr);
         var chartInfo = nc_document.getElementsByClassName('nc_chart_info')[0];
@@ -889,11 +888,6 @@
         return svgChart;
     }
 
-    //Añade un nodo hijo a un nodo
-    //function nc_appendChild(parentNode, childNode) {
-    //    parentNode.appendChild(childNode);
-    //}
-
     //Añade un atributo a un nodo
     function nc_appendAttribute(node, attrName, attrValue) {
         //node.hasAttribute(attrName) //TODO: mirar esto
@@ -916,8 +910,7 @@
         nc_appendAttribute(svg, 'y', y);
         nc_appendAttribute(svg, 'width', width);
         nc_appendAttribute(svg, 'height', height);
-        //nc_appendStyleAttribute(svg, 'width', width);
-        //nc_appendStyleAttribute(svg, 'height', height);
+
         parentNode.appendChild(svg);
         return svg;
     }
@@ -926,17 +919,14 @@
 
     //Crea un path con forma de sector
     function nc_createPathSector(parentNode, cx, cy, r, x1, y1, x2, y2, color) {
-        let path = nc_document.createElementNS('http://www.w3.org/2000/svg', 'path');
+        let path = nc_document.createElementNS(nc_svgns, 'path');
 
         let d = "M" + cx + "," + cy + "  L" + x1 + "," + y1 +
-            " A" + r + "," + r + " 0 0,1 " + x2 + "," + y2 + " z"; //1 means clockwise
-        //alert(d);
-        //arc = paper.path(d);
+            " A" + r + "," + r + " 0 0,1 " + x2 + "," + y2 + " z";
+
+        //La ruta es un atributo
         nc_appendAttribute(path, 'd', d);
         nc_appendAttribute(path, 'fill', color);
-        //arc.setAttribute('d', d);
-        //arc.setAttribute('fill', color);
-
         parentNode.appendChild(path);
         return path;
     }
@@ -972,9 +962,6 @@
         nc_appendAttribute(line, 'x2', x2);
         nc_appendAttribute(line, 'y2', y2);
 
-        //tb va con estilos
-        //nc_appendStyleAttribute(line, 'stroke', 'black');
-        //nc_appendStyleAttribute(line, 'stroke-width', 2);
         nc_appendAttribute(line, 'stroke', color);
         nc_appendAttribute(line, 'stroke-width', 2);
         parentNode.appendChild(line);
@@ -1089,16 +1076,4 @@
     }
 
     //FUNCIONES AUXILIARES FIN
-
-    //BORRAR ESTA FUNCION, PRUEBAS
-    nc.testManual = function (dataStr) {
-        var dataObj = JSON.parse(dataStr);
-        var maximo = nc_maxValue(dataObj.DimensionData);
-        var minimo = nc_minValue(dataObj.DimensionData);
-
-        var escala = nc_createScaleLinear(200, 600, 25, 150);
-        var resultado = escala.getDomainValue(50);
-        alert('makumba');
-    }
-
 }(window);

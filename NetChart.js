@@ -396,7 +396,7 @@
         nc_selection.appendChild(svgRoot);
     }
 
-    //Esta dibuja un gráfico de lineas
+    //Esta función dibuja un gráfico de lineas
     function nc_drawChartLine(data) {
         let svgRoot = nc_getSVGRoot();
         let svgRootWidth = nc_selection.clientWidth;
